@@ -1,5 +1,7 @@
 package GUI;
 
+import ClientEnd.ClientEnd;
+
 import java.awt.*;
 import javax.swing.*;
 
@@ -15,8 +17,8 @@ public class Frame extends JFrame{
 	public static void main(String[] args)
     {
         Frame cloud = new Frame();
-        SignUp signUp = new SignUp(cloud);
-	   // signUp.upSuccess();
+		ClientEnd clientEnd = new ClientEnd();
+        SignIn signIn = new SignIn(cloud,clientEnd);
         cloud.setVisible(true);
     }
 }

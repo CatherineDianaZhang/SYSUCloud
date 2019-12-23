@@ -69,7 +69,7 @@ public class ClientEnd extends Thread {
                             e.printStackTrace();
                         }
                         break;
-                    case 400:
+                    case 401:
                         try {
                             callBackFunc.done(new CallBackFunArg(false, null, null));
                         } catch (Exception e) {
