@@ -77,7 +77,7 @@ public class ClientEnd extends Thread {
                         }
                         break;
                     case 500: throw new IOException("后端错误");
-                    case 401: throw new IOException("用户密码错误");
+                    case 400: throw new IOException("用户密码错误");
                     default: throw new IOException("我也不知道什么问题: " + response.code());
                 }
             }
