@@ -1,5 +1,7 @@
 package GUI;
 
+import ClientEnd.ClientEnd;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,7 +14,7 @@ public class MyCloud extends JFrame{
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	
-	public MyCloud(Frame cloud) {
+	public MyCloud(Frame cloud, ClientEnd clientEnd) {
 		cloud.setTitle("SYSUCloud");
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(0,0,0,0));
@@ -60,6 +62,7 @@ public class MyCloud extends JFrame{
 		JTextField showFileWay = new JTextField("Œ“µƒÕ¯≈Ã / ");
 		showFileWay.setPreferredSize(new Dimension(700,30));
 		showFileWay.setBackground(Color.white);
+		showFileWay.setBorder(BorderFactory.createLineBorder(Color.white));
 		showFileWay.setForeground(Color.gray);
 		showFileWay.setEditable(false);
 		bag.setConstraints(showFileWay,constraints);

@@ -1,26 +1,33 @@
 package GUI;
 
+import ClientEnd.CallBackFunArg;
+import ClientEnd.CallBackFunc;
+import ClientEnd.ClientEnd;
+import com.sun.security.ntlm.Client;
+
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 
-import ClientEnd.CallBackFunArg;
-
-
-public class SignUp extends JFrame implements CallBackFunc{
-	private static final long serialVersionUID = 1L;
+public class SignUp extends JFrame{
 	
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField userName;
 	private JTextField password;
+	private JTextField email;
+	private JTextField name;
+	private JTextField alert;
 	
-	public SignUp(Frame cloud) {
+	
+	public SignUp(Frame cloud, ClientEnd clientEnd) {
 		cloud.setTitle("SYSUCloud--SignUp");
 		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(200,300,200,300));
-		contentPane.setLayout(new GridLayout(3,1));
+		contentPane.setBorder(new EmptyBorder(150,300,150,300));
+		contentPane.setLayout(new GridLayout(6,1));
 		contentPane.setBackground(Color.white);
 		
 		JPanel panel1 = new JPanel();
@@ -41,58 +48,78 @@ public class SignUp extends JFrame implements CallBackFunc{
 		
 		JPanel panel3 = new JPanel();
 		panel3.setBackground(Color.white);
-		panel3.setPreferredSize(new Dimension(150,30));
-		GridBagLayout bag = new GridBagLayout();
-		panel3.setLayout(bag);
-		GridBagConstraints constraints=new GridBagConstraints();
-		constraints.fill=GridBagConstraints.BOTH;
-		constraints.insets=new Insets(20,20,20,20);
-		
-		JButton signUpButton = new JButton("登录");
-		bag.setConstraints(signUpButton,constraints);
+		email = new JTextField();
+		email.setPreferredSize(new Dimension(150,30));
+		email.setBorder(BorderFactory.createLineBorder(Color.lightGray));
+		email.addFocusListener(new TextFieldHintListener(email, "中大邮箱"));
+		panel3.add(email);
+
+		JPanel panel4 = new JPanel();
+		panel4.setBackground(Color.white);
+		name = new JTextField();
+		name.setPreferredSize(new Dimension(150,30));
+		name.setBorder(BorderFactory.createLineBorder(Color.lightGray));
+		name.addFocusListener(new TextFieldHintListener(name, "昵称"));
+		panel4.add(name);
+
+		JPanel panel5 = new JPanel();
+		panel5.setBackground(Color.white);
+		JButton signUpButton = new JButton("注册");
 		signUpButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				alert.setText("");
 				String a = userName.getText();
-				String b = password.getName();
-				boolean ifSuccess = signUp(a,b,new CallBackFunc() {
-					@Override
-					public void done(CallBackFunArg callBackFunArg) throws Exception{
-						System.out.println(callBackFunArg.bool);
-					}
-				});
-				if(ifSuccess) {
-					MyCloud mainPage = new MyCloud(cloud);
-				}
-				else {
-					
+				String b = password.getText();
+				String c = email.getText();
+				String d = name.getText();
+				try {
+					clientEnd.signUp(a,b,c,d,new CallBackFunc() {
+						@Override
+						public void done(CallBackFunArg callBackFunArg) throws Exception{
+							if(callBackFunArg.bool) showSignIn(cloud);
+							else showError();
+						}
+					});
+				} catch (Exception ex) {
+					ex.printStackTrace();
 				}
 			}
 		});
-		panel3.add(signUpButton);
-		
-		JButton signInButton = new JButton("注册");
-		bag.setConstraints(signInButton,constraints);
-		signInButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				SignIn signIn = new SignIn(cloud);
-			}
-		});
-		panel3.add(signInButton);
+		panel5.add(signUpButton);
+
+		JPanel panel6 = new JPanel();
+		panel6.setBackground(Color.white);
+		alert = new JTextField();
+		alert.setEditable(false);
+		alert.setBackground(Color.white);
+		alert.setPreferredSize(new Dimension(150,30));
+		alert.setBorder(BorderFactory.createLineBorder(Color.white));
+		//alert.setForeground(Color.red);
+		panel6.add(alert);
 		
 		contentPane.add(panel1,BorderLayout.NORTH);
-		contentPane.add(panel2,BorderLayout.CENTER);
-		contentPane.add(panel3,BorderLayout.SOUTH);
+		contentPane.add(panel2);
+		contentPane.add(panel3);
+		contentPane.add(panel4);
+		contentPane.add(panel5);
+		contentPane.add(panel6,BorderLayout.SOUTH);
 		
-		JPanel cards = new JPanel(new CardLayout());
+		JPanel cards = (JPanel)cloud.getContentPane().getComponent(0);
 		cards.add(contentPane,"signUp");
 		CardLayout card = (CardLayout)(cards.getLayout());
 		card.show(cards, "signUp");
-		cloud.getContentPane().add(cards);
 	}
-	
-	//点击登录，成功跳转到MyCloud界面，不成功则显示“用户名或密码错误”；点击注册，跳转到注册界面
+
+	private void showError() {
+		alert.setText("信息重复！");
+	}
+
+	private void showSignIn(Frame cloud) {
+		JPanel cards = (JPanel)cloud.getContentPane().getComponent(0);
+		CardLayout card = (CardLayout)(cards.getLayout());
+		card.show(cards, "signIn");
+		cloud.setTitle("SYSUCloud--SignIn");
+	}
 }
