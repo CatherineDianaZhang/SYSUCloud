@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="com.sun.corba:glassfish-corba-asm:3.2.0-b002" type="repository">
+    <properties maven-id="com.sun.corba:glassfish-corba-asm:3.2.0-b002" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/glassfish-corba-asm-3.2.0-b002.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
