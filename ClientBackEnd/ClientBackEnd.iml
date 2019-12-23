@@ -20,5 +20,6 @@
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="com.sun.corba:glassfish-corba-asm:3.2.0-b002" level="project" />
   </component>
 </module>
