@@ -7,8 +7,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -19,6 +18,10 @@ public class MyCloud extends JFrame{
 	private JPanel contentPane;
 	private ImageIcon folder;
 	private ImageIcon txt;
+	private JTextField showFileWay;
+	private String path;
+	private JPanel fileCards;
+	private CardLayout fileCard;
 	
 	public MyCloud(Frame cloud, ClientEnd clientEnd) {
 		cloud.setTitle("SYSUCloud");
@@ -67,7 +70,7 @@ public class MyCloud extends JFrame{
 		constraints.insets=new Insets(0,0,0,5);
 		constraints.weightx = 1;
 
-		JTextField showFileWay = new JTextField("我的网盘 / ");
+		showFileWay = new JTextField("我的网盘");
 		showFileWay.setPreferredSize(new Dimension(630,30));
 		showFileWay.setBackground(Color.white);
 		showFileWay.setBorder(BorderFactory.createLineBorder(Color.white));
@@ -81,8 +84,12 @@ public class MyCloud extends JFrame{
 		backButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-
+				int index1 = path.lastIndexOf("/");
+				String newPath = path.substring(0,index1);
+				fileCard.show(fileCards,newPath);
+				path = newPath;
+				String newPath2 = showFileWay.getText().substring(0,showFileWay.getText().lastIndexOf("/"));
+				showFileWay.setText(newPath2);
 			}
 		});
 		bag.setConstraints(backButton,constraints);
@@ -111,44 +118,57 @@ public class MyCloud extends JFrame{
 		JPanel fileContent = new JPanel();
 		fileContent.setPreferredSize(new Dimension(760,390));
 		fileContent.setBackground(Color.white);
-		files.setViewportView(fileContent);
 
-		JPanel fileCards = new JPanel(new CardLayout());
+		fileCards = new JPanel(new CardLayout());
 		fileCards.add(fileContent,"root");
-		CardLayout fileCard = (CardLayout)(fileCards.getLayout());
+		fileCard = (CardLayout)(fileCards.getLayout());
 		fileCard.show(fileCards, "root");
-		files.add(fileCards);
+		files.setViewportView(fileCards);
+
+		GridBagLayout fileBag = new GridBagLayout();
+		fileContent.setLayout(fileBag);
+		GridBagConstraints fileConstraints=new GridBagConstraints();
+		fileConstraints.fill=GridBagConstraints.BOTH;
+		fileConstraints.insets=new Insets(20,20,20,20);
+
 			//文件列表	
 		try {
-			clientEnd.getFileList("",new CallBackFunc() {
+			clientEnd.getFileList("/",new CallBackFunc() {
 				@Override
 				public void done(CallBackFunArg callBackFunArg) throws Exception{
 					JSONArray fileList = callBackFunArg.jsonArray;
+					path = "/";
 					for(int i=0;i<fileList.size();i++){
 						JSONObject obj = (JSONObject) fileList.get(i);
 						JButton b = new JButton(obj.get("name").toString());
 						if(obj.get("type").toString() == "FOLDER") b.setIcon(folder);
 						else b.setIcon(txt);
-						b.addActionListener(new ActionListener() {
+						b.setBackground(Color.white);
+						b.setBorder(BorderFactory.createLineBorder(Color.white));
+						b.addMouseListener(new MouseAdapter() {
 							@Override
-							public void actionPerformed(ActionEvent e) {
-								// TODO Auto-generated method stub
-
+							public void mouseClicked(MouseEvent e) {
+								if(e.getClickCount() == 2 && obj.get("type") == "FOLDER") {
+									try {
+										getInNextLevel(obj.get("id"),clientEnd,fileCards);
+									} catch (Exception ex) {
+										ex.printStackTrace();
+									}
+								}
+								//else if(e.getClickCount() == 2 && obj.get("type") == "FILE") openFile(obj.get("id"));
 							}
 						});
+						MouseListener popupListener = rightClick();
+						b.addMouseListener(popupListener);
+						fileBag.setConstraints(b,fileConstraints);
+						if(i%10 == 0) fileConstraints.gridwidth=GridBagConstraints.REMAINDER;
+						else fileConstraints.gridwidth = 1;
 					}
 				}
 			});
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		
-		
-			//右键弹出下载、分享、删除
-		
-		
-		
-		
 				
 		//quickShare
 		quickShare.setPreferredSize(new Dimension(770,80));
@@ -164,7 +184,93 @@ public class MyCloud extends JFrame{
 		filePage.add(quickShare,BorderLayout.SOUTH);
 		return filePage;
 	}
-	
+
+	private void getInNextLevel(Object id,ClientEnd clientEnd,JPanel fileCards) throws Exception {
+		int ID = (int)id;
+		clientEnd.getFileDetails(ID, new CallBackFunc() {
+			@Override
+			public void done(CallBackFunArg callBackFunArg) throws Exception {
+				JSONObject obj = callBackFunArg.jsonObject;
+				JSONArray  children = (JSONArray) obj.get("children");
+				String temp = showFileWay.getText()+"/"+obj.get("name");
+				showFileWay.setText(temp);
+				JPanel levelContent = new JPanel();
+				fileCards.add(levelContent,obj.get("fullPath").toString());
+				CardLayout fileCard = (CardLayout)(fileCards.getLayout());
+				fileCard.show(fileCards, obj.get("fullPath").toString());
+				path = obj.get("fullPath").toString();
+
+				GridBagLayout fileBag = new GridBagLayout();
+				levelContent.setLayout(fileBag);
+				GridBagConstraints fileConstraints=new GridBagConstraints();
+				fileConstraints.fill=GridBagConstraints.BOTH;
+				fileConstraints.insets=new Insets(20,20,20,20);
+
+				for(int i=0;i<children.size();i++){
+					JSONObject o = (JSONObject) children.get(i);
+					JButton b = new JButton(o.get("name").toString());
+					if(o.get("type").toString() == "FOLDER") b.setIcon(folder);
+					else b.setIcon(txt);
+					b.setBackground(Color.white);
+					b.setBorder(BorderFactory.createLineBorder(Color.white));
+					b.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							if(e.getClickCount() == 2 && o.get("type") == "FOLDER") {
+								try {
+									getInNextLevel(o.get("id"),clientEnd,fileCards);
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+							}
+							//else if(e.getClickCount() == 2 && o.get("type") == "FILE") openFile(obj.get("id"));
+						}
+					});
+					MouseListener popupListener = rightClick();
+					b.addMouseListener(popupListener);
+
+					fileBag.setConstraints(b,fileConstraints);
+					if(i%10 == 0) fileConstraints.gridwidth=GridBagConstraints.REMAINDER;
+					else fileConstraints.gridwidth = 1;
+				}
+			}
+		});
+	}
+
+	private MouseListener rightClick(){
+		//右键弹出下载、分享、删除
+		JPopupMenu jPopupMenuOne = new JPopupMenu();
+		ButtonGroup buttonGroupOne = new ButtonGroup();
+		JMenuItem down = new JMenuItem("下载");
+		down.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+			}
+		});
+		jPopupMenuOne.add(down);
+		jPopupMenuOne.addSeparator();
+		JMenuItem share = new JMenuItem("分享");
+		share.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+			}
+		});
+		jPopupMenuOne.add(share);
+		jPopupMenuOne.addSeparator();
+		JMenuItem delete = new JMenuItem("删除");
+		delete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+			}
+		});
+		jPopupMenuOne.add(delete);
+		MouseListener temp = new PopupListener(jPopupMenuOne);
+		return temp;
+	}
+
 	protected JScrollPane makeSharePage(JFrame cloud,ClientEnd clientEnd) {
 		JScrollPane sharePage = new JScrollPane();
 		JPanel shareContent = new JPanel();
@@ -187,4 +293,25 @@ public class MyCloud extends JFrame{
 		
 		return transPage;
 	}
+
+	class PopupListener extends MouseAdapter {
+		JPopupMenu popupMenu;
+		PopupListener(JPopupMenu popupMenu) {
+			this.popupMenu=popupMenu;
+		}
+		public void mousePressed(MouseEvent e) {
+			showPopupMenu(e);
+		}
+		public void mouseReleased(MouseEvent e) {
+			showPopupMenu(e);
+		}
+		private void showPopupMenu(MouseEvent e) {
+			if(e.isPopupTrigger())
+			{
+				//如果当前事件与鼠标事件相关，则弹出菜单
+				popupMenu.show(e.getComponent(),e.getX(),e.getY());
+			}
+		}
+	}
 }
+
