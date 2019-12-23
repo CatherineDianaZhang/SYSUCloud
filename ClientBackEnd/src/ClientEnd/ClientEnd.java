@@ -142,7 +142,7 @@ public class ClientEnd extends Thread {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    callBackFunc.done(new CallBackFunArg(true, JSON.parseObject(response.body().toString()), null);
+                    callBackFunc.done(new CallBackFunArg(true, JSON.parseObject(response.body().toString()), null));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
