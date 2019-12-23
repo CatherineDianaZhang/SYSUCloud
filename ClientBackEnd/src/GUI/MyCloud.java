@@ -22,8 +22,10 @@ public class MyCloud extends JFrame{
 	private String path;
 	private JPanel fileCards;
 	private CardLayout fileCard;
+	private ClientEnd clientEnd;
 	
 	public MyCloud(Frame cloud, ClientEnd clientEnd) {
+		this.clientEnd = clientEnd;
 		cloud.setTitle("SYSUCloud");
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(0,0,0,0));
@@ -158,7 +160,7 @@ public class MyCloud extends JFrame{
 								//else if(e.getClickCount() == 2 && obj.get("type") == "FILE") openFile(obj.get("id"));
 							}
 						});
-						MouseListener popupListener = rightClick();
+						MouseListener popupListener = rightClick(obj.get("id"),fileContent,b);
 						b.addMouseListener(popupListener);
 						fileBag.setConstraints(b,fileConstraints);
 						if(i%10 == 0) fileConstraints.gridwidth=GridBagConstraints.REMAINDER;
@@ -226,7 +228,7 @@ public class MyCloud extends JFrame{
 							//else if(e.getClickCount() == 2 && o.get("type") == "FILE") openFile(obj.get("id"));
 						}
 					});
-					MouseListener popupListener = rightClick();
+					MouseListener popupListener = rightClick(o.get("id"),levelContent,b);
 					b.addMouseListener(popupListener);
 
 					fileBag.setConstraints(b,fileConstraints);
@@ -237,7 +239,8 @@ public class MyCloud extends JFrame{
 		});
 	}
 
-	private MouseListener rightClick(){
+	private MouseListener rightClick(Object id,JPanel levelContent,JButton button){
+		int ID = (int)id;
 		//ÓÒ¼üµ¯³öÏÂÔØ¡¢·ÖÏí¡¢É¾³ý
 		JPopupMenu jPopupMenuOne = new JPopupMenu();
 		ButtonGroup buttonGroupOne = new ButtonGroup();
@@ -245,7 +248,7 @@ public class MyCloud extends JFrame{
 		down.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				levelContent.remove(button);
 			}
 		});
 		jPopupMenuOne.add(down);
@@ -263,7 +266,16 @@ public class MyCloud extends JFrame{
 		delete.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				try {
+					clientEnd.delFile(ID, new CallBackFunc() {
+						@Override
+						public void done(CallBackFunArg callBackFunArg) throws Exception {
 
+						}
+					});
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 		});
 		jPopupMenuOne.add(delete);
