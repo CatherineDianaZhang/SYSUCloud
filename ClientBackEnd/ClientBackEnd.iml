@@ -10,7 +10,7 @@
     <orderEntry type="library" exported="" name="com.squareup.okhttp3:okhttp:4.2.1" level="project" />
     <orderEntry type="library" exported="" name="com.alibaba:fastjson:1.2.59" level="project" />
     <orderEntry type="library" exported="" name="net.sf.jmimemagic:jmimemagic:0.1.5" level="project" />
-    <orderEntry type="module-library" exported="">
+    <orderEntry type="module-library">
       <library>
         <CLASSES>
           <root url="file://$MODULE_DIR$/lib" />

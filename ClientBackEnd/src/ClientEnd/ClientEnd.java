@@ -77,6 +77,7 @@ public class ClientEnd extends Thread {
                         }
                         break;
                     case 500: throw new IOException("后端错误");
+                    case 401: throw new IOException("用户密码错误");
                     default: throw new IOException("我也不知道什么问题: " + response.code());
                 }
             }
@@ -118,6 +119,7 @@ public class ClientEnd extends Thread {
                             e.printStackTrace();
                         } break;
                     case 500: throw new IOException(("后端错误"));
+                    case 401: throw new IOException("用户已经存在");
                     default: throw new IOException("我也不知道什么问题: " + response.code());
                 }
             }
@@ -126,9 +128,9 @@ public class ClientEnd extends Thread {
     }
 
     public void getFileList(String path, CallBackFunc callBackFunc) throws Exception {
-        final MediaType JSON = MediaType.parse("application/json");
+//        final MediaType JSON = MediaType.parse("application/json");
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/index/" + path)
+                .url(this.url + ':' + this.port + "/folders/" + path)
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -140,13 +142,36 @@ public class ClientEnd extends Thread {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    callBackFunc.done(new CallBackFunArg(true, null, com.alibaba.fastjson.JSON.parseArray(response.body().string())));
+                    callBackFunc.done(new CallBackFunArg(true, JSON.parseObject(response.body().toString()), null);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
 
+    }
+
+    public void createFolder(String path, CallBackFunc callBackFunc) throws Exception {
+        Request request = new Request.Builder()
+                .url(this.getUrl() + ':' + this.getPort() + "/folders/" + path)
+                .post(RequestBody.create(MediaType.parse("application/json"), ""))
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try {
+                    callBackFunc.done(new CallBackFunArg(true, null, null));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     public void getFileDetails(int fileId, CallBackFunc callBackFunc) throws Exception {
@@ -198,7 +223,7 @@ public class ClientEnd extends Thread {
 
     public void download(int fileId, CallBackFunc callBackFunc) throws Exception {
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/download/" + fileId)
+                .url(this.url + ':' + this.port + "/files/" + fileId)
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
