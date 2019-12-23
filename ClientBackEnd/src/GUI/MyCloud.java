@@ -1,6 +1,10 @@
 package GUI;
 
 import ClientEnd.ClientEnd;
+import ClientEnd.CallBackFunc;
+import ClientEnd.CallBackFunArg;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,6 +17,8 @@ public class MyCloud extends JFrame{
 	
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
+	private ImageIcon folder;
+	private ImageIcon txt;
 	
 	public MyCloud(Frame cloud, ClientEnd clientEnd) {
 		cloud.setTitle("SYSUCloud");
@@ -24,13 +30,13 @@ public class MyCloud extends JFrame{
 		JTabbedPane pages = new JTabbedPane();
 		pages.setBackground(Color.white);
 		
-		JPanel filePage = makeFilePage(cloud);
+		JPanel filePage = makeFilePage(cloud,clientEnd);
 		pages.addTab("我的网盘",filePage);
 		
-		JScrollPane sharePage = makeSharePage(cloud);
+		JScrollPane sharePage = makeSharePage(cloud,clientEnd);
 		pages.addTab("我的分享", sharePage);
 		
-		JScrollPane transPage = makeTransPage(cloud);
+		JScrollPane transPage = makeTransPage(cloud,clientEnd);
 		pages.addTab("我的传输", transPage);
 		
 		contentPane.add(pages);
@@ -42,9 +48,11 @@ public class MyCloud extends JFrame{
 		card.show(cards, "mainPage");
 	}
 	
-	protected JPanel makeFilePage(JFrame cloud) {
+	protected JPanel makeFilePage(JFrame cloud,ClientEnd clientEnd) {
 		JPanel filePage = new JPanel();
 		filePage.setBackground(Color.white);
+		folder = new ImageIcon("folder.png");
+		txt = new ImageIcon("txt.png");
 		
 		JPanel addressAndUpdate = new JPanel();
 		JScrollPane files = new JScrollPane();
@@ -58,22 +66,40 @@ public class MyCloud extends JFrame{
 		constraints.fill=GridBagConstraints.BOTH;
 		constraints.insets=new Insets(0,0,0,5);
 		constraints.weightx = 1;
-		
+
 		JTextField showFileWay = new JTextField("我的网盘 / ");
-		showFileWay.setPreferredSize(new Dimension(700,30));
+		showFileWay.setPreferredSize(new Dimension(630,30));
 		showFileWay.setBackground(Color.white);
 		showFileWay.setBorder(BorderFactory.createLineBorder(Color.white));
 		showFileWay.setForeground(Color.gray);
 		showFileWay.setEditable(false);
 		bag.setConstraints(showFileWay,constraints);
 		addressAndUpdate.add(showFileWay);
+
+		JButton backButton = new JButton("返回");
+		backButton.setPreferredSize(new Dimension(60,30));
+		backButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		bag.setConstraints(backButton,constraints);
+		addressAndUpdate.add(backButton);
 		
 		JButton updateButton = new JButton("上传");
+		updateButton.setPreferredSize(new Dimension(60,30));
 		updateButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
+				/*clientEnd.upload(file,new CallBackFunc() {
+					@Override
+					public void done(CallBackFunArg callBackFunArg) throws Exception {
+
+					}
+				});*/
 			}
 		});
 		bag.setConstraints(updateButton,constraints);
@@ -86,9 +112,36 @@ public class MyCloud extends JFrame{
 		fileContent.setPreferredSize(new Dimension(760,390));
 		fileContent.setBackground(Color.white);
 		files.setViewportView(fileContent);
-		
+
+		JPanel fileCards = new JPanel(new CardLayout());
+		fileCards.add(fileContent,"root");
+		CardLayout fileCard = (CardLayout)(fileCards.getLayout());
+		fileCard.show(fileCards, "root");
+		files.add(fileCards);
 			//文件列表	
-		
+		try {
+			clientEnd.getFileList("",new CallBackFunc() {
+				@Override
+				public void done(CallBackFunArg callBackFunArg) throws Exception{
+					JSONArray fileList = callBackFunArg.jsonArray;
+					for(int i=0;i<fileList.size();i++){
+						JSONObject obj = (JSONObject) fileList.get(i);
+						JButton b = new JButton(obj.get("name").toString());
+						if(obj.get("type").toString() == "FOLDER") b.setIcon(folder);
+						else b.setIcon(txt);
+						b.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								// TODO Auto-generated method stub
+
+							}
+						});
+					}
+				}
+			});
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 		
 		
 			//右键弹出下载、分享、删除
@@ -112,7 +165,7 @@ public class MyCloud extends JFrame{
 		return filePage;
 	}
 	
-	protected JScrollPane makeSharePage(JFrame cloud) {
+	protected JScrollPane makeSharePage(JFrame cloud,ClientEnd clientEnd) {
 		JScrollPane sharePage = new JScrollPane();
 		JPanel shareContent = new JPanel();
 		shareContent.setBackground(Color.white);
@@ -125,7 +178,7 @@ public class MyCloud extends JFrame{
 		return sharePage;
 	}
 	
-	protected JScrollPane makeTransPage(JFrame cloud) {
+	protected JScrollPane makeTransPage(JFrame cloud,ClientEnd clientEnd) {
 		JScrollPane transPage = new JScrollPane();
 		JPanel transContent = new JPanel();
 		transContent.setBackground(Color.white);
