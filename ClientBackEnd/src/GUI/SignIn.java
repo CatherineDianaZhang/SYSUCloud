@@ -31,7 +31,7 @@ public class SignIn extends JFrame{
 		userName = new JTextField();
 		userName.setPreferredSize(new Dimension(150,30));
 		userName.setBorder(BorderFactory.createLineBorder(Color.lightGray));
-		userName.addFocusListener(new TextFieldHintListener(userName, "ÓÃ»§Ãû"));
+		userName.addFocusListener(new TextFieldHintListener(userName, "ç”¨æˆ·å"));
 		panel1.add(userName);
 		
 		JPanel panel2 = new JPanel();
@@ -39,7 +39,7 @@ public class SignIn extends JFrame{
 		password = new JTextField();
 		password.setPreferredSize(new Dimension(150,30));
 		password.setBorder(BorderFactory.createLineBorder(Color.lightGray));
-		password.addFocusListener(new TextFieldHintListener(password, "ÃÜÂë"));
+		password.addFocusListener(new TextFieldHintListener(password, "å¯†ç "));
 		panel2.add(password);
 		
 		JPanel panel3 = new JPanel();
@@ -51,7 +51,7 @@ public class SignIn extends JFrame{
 		constraints.fill=GridBagConstraints.BOTH;
 		constraints.insets=new Insets(20,20,20,20);
 		
-		JButton signInButton = new JButton("µÇÂ¼");
+		JButton signInButton = new JButton("ç™»å½•");
 		bag.setConstraints(signInButton,constraints);
 		signInButton.addActionListener(new ActionListener() {
 			@Override
@@ -65,7 +65,7 @@ public class SignIn extends JFrame{
 						@Override
 						public void done(CallBackFunArg callBackFunArg) throws Exception{
 							if(callBackFunArg.bool) showCloud(cloud,clientEnd);
-							else alert.setText("ÓÃ»§Ãû»òÃÜÂë´íÎó£¡");
+							else alert.setText("ç”¨æˆ·åæˆ–å¯†ç é”™è¯¯ï¼");
 						}
 					});
 				} catch (Exception ex) {
@@ -75,7 +75,7 @@ public class SignIn extends JFrame{
 		});
 		panel3.add(signInButton);
 		
-		JButton signUpButton = new JButton("×¢²á");
+		JButton signUpButton = new JButton("æ³¨å†Œ");
 		bag.setConstraints(signUpButton,constraints);
 		signUpButton.addActionListener(new ActionListener() {
 			@Override

@@ -8,10 +8,27 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ClientEnd extends Thread {
     private static String url = "http://cloud.sysu.rwong.tech";
-    private static final OkHttpClient client = new OkHttpClient();
+    private static final OkHttpClient client = new OkHttpClient.Builder()
+            .cookieJar(new CookieJar() {
+                // Just for simply store JSESSIONID
+                private List<Cookie> sessionCookie = new LinkedList<>();
+                @Override
+                public void saveFromResponse(@NotNull HttpUrl httpUrl, @NotNull List<Cookie> list) {
+                    sessionCookie = list;
+                }
+
+                @NotNull
+                @Override
+                public List<Cookie> loadForRequest(@NotNull HttpUrl httpUrl) {
+                    return sessionCookie;
+                }
+            })
+            .build();
     private static int port = 8080;
 
     public String getUrl() {return this.url;}
@@ -249,14 +266,13 @@ public class ClientEnd extends Thread {
     }
 
     public void upload(File file, String fullPath, CallBackFunc callBackFunc) throws Exception {
-            Magic parser = new Magic();
-            MagicMatch match = parser.getMagicMatch(file, false);
-            String fileType = match.getMimeType() ;
+            MagicMatch match = Magic.getMagicMatch(file, false);
+            String fileType = match.getMimeType();
 
             RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("file", file.getName(),
                             RequestBody.create(MediaType.parse(fileType), file))
-                    .addFormDataPart("fullPath", fullPath)
+                    .addFormDataPart("fullPath", fullPath + file.getName())
                     .build();
 
             Request request = new Request.Builder()
@@ -278,6 +294,8 @@ public class ClientEnd extends Thread {
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                     try {
+                        System.out.println(response.code());
+                        System.out.println(response.body().string());
                         callBackFunc.done(new CallBackFunArg(true, null, null));
                     } catch (Exception e) {
                         e.printStackTrace();

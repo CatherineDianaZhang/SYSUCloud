@@ -31,22 +31,22 @@ public class MyCloud extends JFrame{
 		contentPane.setBorder(new EmptyBorder(0,0,0,0));
 		contentPane.setLayout(new GridLayout(1,1));
 		contentPane.setBackground(Color.white);
-		//Ñ¡Ïî¿¨Ãæ°å
+		//é€‰é¡¹å¡é¢æ¿
 		JTabbedPane pages = new JTabbedPane();
 		pages.setBackground(Color.white);
 		
 		JPanel filePage = makeFilePage(cloud,clientEnd);
-		pages.addTab("ÎÒµÄÍøÅÌ",filePage);
+		pages.addTab("æˆ‘çš„ç½‘ç›˜",filePage);
 		
 		JScrollPane sharePage = makeSharePage(cloud,clientEnd);
-		pages.addTab("ÎÒµÄ·ÖÏí", sharePage);
+		pages.addTab("æˆ‘çš„åˆ†äº«", sharePage);
 		
 		JScrollPane transPage = makeTransPage(cloud,clientEnd);
-		pages.addTab("ÎÒµÄ´«Êä", transPage);
+		pages.addTab("æˆ‘çš„ä¼ è¾“", transPage);
 		
 		contentPane.add(pages);
 		
-		//Ìí¼ÓÕû¸öÒ³Ãæ
+		//æ·»åŠ æ•´ä¸ªé¡µé¢
 		JPanel cards = (JPanel)cloud.getContentPane().getComponent(0);
 		cards.add(contentPane,"mainPage");
 		CardLayout card = (CardLayout)(cards.getLayout());
@@ -71,7 +71,7 @@ public class MyCloud extends JFrame{
 		constraints.insets=new Insets(0,0,0,5);
 		constraints.weightx = 1;
 
-		showFileWay = new JTextField("ÎÒµÄÍøÅÌ");
+		showFileWay = new JTextField("æˆ‘çš„ç½‘ç›˜");
 		showFileWay.setPreferredSize(new Dimension(620,30));
 		showFileWay.setBackground(Color.white);
 		showFileWay.setBorder(BorderFactory.createLineBorder(Color.white));
@@ -80,7 +80,7 @@ public class MyCloud extends JFrame{
 		bag.setConstraints(showFileWay,constraints);
 		addressAndUpdate.add(showFileWay);
 
-		JButton backButton = new JButton("·µ»Ø");
+		JButton backButton = new JButton("è¿”å›");
 		backButton.setPreferredSize(new Dimension(60,30));
 		backButton.addActionListener(new ActionListener() {
 			@Override
@@ -96,7 +96,7 @@ public class MyCloud extends JFrame{
 		bag.setConstraints(backButton,constraints);
 		addressAndUpdate.add(backButton);
 		
-		JButton updateButton = new JButton("ÉÏ´«");
+		JButton updateButton = new JButton("ä¸Šä¼ ");
 		updateButton.setPreferredSize(new Dimension(60,30));
 		updateButton.addActionListener(new ActionListener() {
 			@Override
@@ -132,18 +132,18 @@ public class MyCloud extends JFrame{
 		fileContent.setBackground(Color.white);
 		files.setViewportView(fileContent);
 
-			//ÎÄ¼şÁĞ±í
+			//æ–‡ä»¶åˆ—è¡¨
 		showFile("/");
 				
 		//quickShare
 		quickShare.setPreferredSize(new Dimension(770,80));
 		quickShare.setBackground(Color.white);
-		JLabel filler=new JLabel("<html><p align=\"center\">ÓÒ¼üµã»÷»ò½«ÎÄ¼şÍÏ×§µ½ÕâÀï½øĞĞ·ÖÏí</p><br><p align=\"center\">Ö§³ÖÀ©Õ¹Ãû£º.rar .zip .doc .docx .pdf .jpg...</p></html>");
+		JLabel filler=new JLabel("<html><p align=\"center\">å³é”®ç‚¹å‡»æˆ–å°†æ–‡ä»¶æ‹–æ‹½åˆ°è¿™é‡Œè¿›è¡Œåˆ†äº«</p><br><p align=\"center\">æ”¯æŒæ‰©å±•åï¼š.rar .zip .doc .docx .pdf .jpg...</p></html>");
 	    filler.setHorizontalAlignment(JLabel.CENTER);
 	    quickShare.setLayout(new GridLayout(1,1));
 	    quickShare.add(filler);
 	    
-		//Ìí¼ÓÈı¸öÒ³Ãæ
+		//æ·»åŠ ä¸‰ä¸ªé¡µé¢
 		filePage.add(addressAndUpdate,BorderLayout.NORTH);
 		filePage.add(files);
 		filePage.add(quickShare,BorderLayout.SOUTH);
@@ -189,7 +189,10 @@ public class MyCloud extends JFrame{
 						fileBag.setConstraints(b,fileConstraints);
 						if(i%10 == 0) fileConstraints.gridwidth=GridBagConstraints.REMAINDER;
 						else fileConstraints.gridwidth = 1;
+						fileContent.add(b);
 					}
+					fileContent.revalidate();
+					fileContent.repaint();
 				}
 			});
 		} catch (Exception ex) {
@@ -214,10 +217,10 @@ public class MyCloud extends JFrame{
 
 	private MouseListener rightClick(Object id,JPanel content,JButton button){
 		int ID = (int)id;
-		//ÓÒ¼üµ¯³öÏÂÔØ¡¢·ÖÏí¡¢É¾³ı
+		//å³é”®å¼¹å‡ºä¸‹è½½ã€åˆ†äº«ã€åˆ é™¤
 		JPopupMenu jPopupMenuOne = new JPopupMenu();
 		ButtonGroup buttonGroupOne = new ButtonGroup();
-		JMenuItem down = new JMenuItem("ÏÂÔØ");
+		JMenuItem down = new JMenuItem("ä¸‹è½½");
 		down.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -226,7 +229,7 @@ public class MyCloud extends JFrame{
 		});
 		jPopupMenuOne.add(down);
 		jPopupMenuOne.addSeparator();
-		JMenuItem share = new JMenuItem("·ÖÏí");
+		JMenuItem share = new JMenuItem("åˆ†äº«");
 		share.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -235,7 +238,7 @@ public class MyCloud extends JFrame{
 		});
 		jPopupMenuOne.add(share);
 		jPopupMenuOne.addSeparator();
-		JMenuItem delete = new JMenuItem("É¾³ı");
+		JMenuItem delete = new JMenuItem("åˆ é™¤");
 		delete.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -294,7 +297,7 @@ public class MyCloud extends JFrame{
 		private void showPopupMenu(MouseEvent e) {
 			if(e.isPopupTrigger())
 			{
-				//Èç¹ûµ±Ç°ÊÂ¼şÓëÊó±êÊÂ¼şÏà¹Ø£¬Ôòµ¯³ö²Ëµ¥
+				//å¦‚æœå½“å‰äº‹ä»¶ä¸é¼ æ ‡äº‹ä»¶ç›¸å…³ï¼Œåˆ™å¼¹å‡ºèœå•
 				popupMenu.show(e.getComponent(),e.getX(),e.getY());
 			}
 		}

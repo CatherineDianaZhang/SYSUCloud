@@ -35,7 +35,7 @@ public class SignUp extends JFrame{
 		userName = new JTextField();
 		userName.setPreferredSize(new Dimension(150,30));
 		userName.setBorder(BorderFactory.createLineBorder(Color.lightGray));
-		userName.addFocusListener(new TextFieldHintListener(userName, "”√ªß√˚"));
+		userName.addFocusListener(new TextFieldHintListener(userName, "Áî®Êà∑Âêç"));
 		panel1.add(userName);
 		
 		JPanel panel2 = new JPanel();
@@ -43,7 +43,7 @@ public class SignUp extends JFrame{
 		password = new JTextField();
 		password.setPreferredSize(new Dimension(150,30));
 		password.setBorder(BorderFactory.createLineBorder(Color.lightGray));
-		password.addFocusListener(new TextFieldHintListener(password, "√‹¬Î"));
+		password.addFocusListener(new TextFieldHintListener(password, "ÂØÜÁ†Å"));
 		panel2.add(password);
 		
 		JPanel panel3 = new JPanel();
@@ -51,7 +51,7 @@ public class SignUp extends JFrame{
 		email = new JTextField();
 		email.setPreferredSize(new Dimension(150,30));
 		email.setBorder(BorderFactory.createLineBorder(Color.lightGray));
-		email.addFocusListener(new TextFieldHintListener(email, "÷–¥Û” œ‰"));
+		email.addFocusListener(new TextFieldHintListener(email, "‰∏≠Â§ßÈÇÆÁÆ±"));
 		panel3.add(email);
 
 		JPanel panel4 = new JPanel();
@@ -59,12 +59,12 @@ public class SignUp extends JFrame{
 		name = new JTextField();
 		name.setPreferredSize(new Dimension(150,30));
 		name.setBorder(BorderFactory.createLineBorder(Color.lightGray));
-		name.addFocusListener(new TextFieldHintListener(name, "Í«≥∆"));
+		name.addFocusListener(new TextFieldHintListener(name, "ÊòµÁß∞"));
 		panel4.add(name);
 
 		JPanel panel5 = new JPanel();
 		panel5.setBackground(Color.white);
-		JButton signUpButton = new JButton("◊¢≤·");
+		JButton signUpButton = new JButton("Ê≥®ÂÜå");
 		signUpButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -113,7 +113,7 @@ public class SignUp extends JFrame{
 	}
 
 	private void showError() {
-		alert.setText("–≈œ¢÷ÿ∏¥£°");
+		alert.setText("‰ø°ÊÅØÈáçÂ§çÔºÅ");
 	}
 
 	private void showSignIn(Frame cloud) {

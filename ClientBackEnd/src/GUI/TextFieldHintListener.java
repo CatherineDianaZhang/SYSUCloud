@@ -12,18 +12,18 @@ public class TextFieldHintListener implements FocusListener{
 	public TextFieldHintListener(JTextField userName,String hintText) {		
 		this.textField = userName;		
 		this.hintText = hintText;		
-		userName.setText(hintText);  //Ä¬ÈÏÖ±½ÓÏÔÊ¾		
+		userName.setText(hintText);  //é»˜è®¤ç›´æ¥æ˜¾ç¤º		
 		userName.setForeground(Color.GRAY);	
 	} 	
 	@Override	
-	public void focusGained(FocusEvent e) {		//»ñÈ¡½¹µãÊ±£¬Çå¿ÕÌáÊ¾ÄÚÈİ		
+	public void focusGained(FocusEvent e) {		//è·å–ç„¦ç‚¹æ—¶ï¼Œæ¸…ç©ºæç¤ºå†…å®¹		
 		String temp = textField.getText();		
 		if(temp.equals(hintText)) {			
 			textField.setText("");			
 			textField.setForeground(Color.BLACK);		
 		}	
 	} 	
-	@Override	public void focusLost(FocusEvent e) {		//Ê§È¥½¹µãÊ±£¬Ã»ÓĞÊäÈëÄÚÈİ£¬ÏÔÊ¾ÌáÊ¾ÄÚÈİ		
+	@Override	public void focusLost(FocusEvent e) {		//å¤±å»ç„¦ç‚¹æ—¶ï¼Œæ²¡æœ‰è¾“å…¥å†…å®¹ï¼Œæ˜¾ç¤ºæç¤ºå†…å®¹		
 		String temp = textField.getText();		
 		if(temp.equals("")) {			
 			textField.setForeground(Color.GRAY);			
