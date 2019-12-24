@@ -17,13 +17,13 @@ public class MyCloud extends JFrame{
 	
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private ImageIcon folder;
-	private ImageIcon txt;
+	private ImageIcon folder = new ImageIcon("folder.png");
+	private ImageIcon txt = new ImageIcon("txt.png");;
 	private JTextField showFileWay;
 	private String path;
 	private JPanel fileContent;
 	private ClientEnd clientEnd;
-	
+
 	public MyCloud(Frame cloud, ClientEnd clientEnd) {
 		this.clientEnd = clientEnd;
 		cloud.setTitle("SYSUCloud");
@@ -56,8 +56,7 @@ public class MyCloud extends JFrame{
 	protected JPanel makeFilePage(JFrame cloud,ClientEnd clientEnd) {
 		JPanel filePage = new JPanel();
 		filePage.setBackground(Color.white);
-		folder = new ImageIcon("folder.png");
-		txt = new ImageIcon("txt.png");
+		path = "/";
 		
 		JPanel addressAndUpdate = new JPanel();
 		JScrollPane files = new JScrollPane();
@@ -88,7 +87,7 @@ public class MyCloud extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				int index1 = path.lastIndexOf("/");
 				String newPath = path.substring(0,index1);
-				fileCard.show(fileCards,newPath);
+				showFile(newPath);
 				path = newPath;
 				String newPath2 = showFileWay.getText().substring(0,showFileWay.getText().lastIndexOf("/"));
 				showFileWay.setText(newPath2);
@@ -105,18 +104,20 @@ public class MyCloud extends JFrame{
 				JFileChooser f = new JFileChooser("F:\\");
 				int val = f.showOpenDialog(null);
 				File file = null;
-				if(val == f.APPROVE_OPTION) file = f.getSelectedFile();
-				try {
-					clientEnd.upload(file,path,new CallBackFunc() {
-						@Override
-						public void done(CallBackFunArg callBackFunArg) throws Exception {
-							if(callBackFunArg.bool){
-
+				if(val == f.APPROVE_OPTION) {
+					file = f.getSelectedFile();
+					try {
+						clientEnd.upload(file,path,new CallBackFunc() {
+							@Override
+							public void done(CallBackFunArg callBackFunArg) throws Exception {
+								if(callBackFunArg.bool) showFile(path);
+								System.out.println(callBackFunArg.bool);
+								System.out.println(path);
 							}
-						}
-					});
-				} catch (Exception ex) {
-					ex.printStackTrace();
+						});
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
 				}
 			}
 		});
@@ -131,25 +132,44 @@ public class MyCloud extends JFrame{
 		fileContent.setBackground(Color.white);
 		files.setViewportView(fileContent);
 
+			//文件列表
+		showFile("/");
+				
+		//quickShare
+		quickShare.setPreferredSize(new Dimension(770,80));
+		quickShare.setBackground(Color.white);
+		JLabel filler=new JLabel("<html><p align=\"center\">右键点击或将文件拖拽到这里进行分享</p><br><p align=\"center\">支持扩展名：.rar .zip .doc .docx .pdf .jpg...</p></html>");
+	    filler.setHorizontalAlignment(JLabel.CENTER);
+	    quickShare.setLayout(new GridLayout(1,1));
+	    quickShare.add(filler);
+	    
+		//添加三个页面
+		filePage.add(addressAndUpdate,BorderLayout.NORTH);
+		filePage.add(files);
+		filePage.add(quickShare,BorderLayout.SOUTH);
+		return filePage;
+	}
+
+	private void showFile(String path){
+		System.out.println("a");
+		fileContent.removeAll();
 		GridBagLayout fileBag = new GridBagLayout();
 		fileContent.setLayout(fileBag);
 		GridBagConstraints fileConstraints=new GridBagConstraints();
 		fileConstraints.fill=GridBagConstraints.BOTH;
 		fileConstraints.insets=new Insets(20,20,20,20);
-
-			//文件列表	
 		try {
-			clientEnd.getFileList("/",new CallBackFunc() {
+			clientEnd.getFileList(path,new CallBackFunc() {
 				@Override
 				public void done(CallBackFunArg callBackFunArg) throws Exception{
-					JSONArray fileList = callBackFunArg.jsonArray;
-					path = "/";
+					JSONArray fileList = callBackFunArg.jsonObject.getJSONArray("children");
+					//System.out.println(fileList.size());
 					for(int i=0;i<fileList.size();i++){
 						JSONObject obj = (JSONObject) fileList.get(i);
 						JButton b = new JButton(obj.get("name").toString());
 						if(obj.get("type").toString() == "FOLDER") b.setIcon(folder);
 						else b.setIcon(txt);
-						b.setBackground(Color.white);
+						//b.setBackground(Color.white);
 						b.setBorder(BorderFactory.createLineBorder(Color.white));
 						b.addMouseListener(new MouseAdapter() {
 							@Override
@@ -175,20 +195,6 @@ public class MyCloud extends JFrame{
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-				
-		//quickShare
-		quickShare.setPreferredSize(new Dimension(770,80));
-		quickShare.setBackground(Color.white);
-		JLabel filler=new JLabel("<html><p align=\"center\">右键点击或将文件拖拽到这里进行分享</p><br><p align=\"center\">支持扩展名：.rar .zip .doc .docx .pdf .jpg...</p></html>");
-	    filler.setHorizontalAlignment(JLabel.CENTER);
-	    quickShare.setLayout(new GridLayout(1,1));
-	    quickShare.add(filler);
-	    
-		//添加三个页面
-		filePage.add(addressAndUpdate,BorderLayout.NORTH);
-		filePage.add(files);
-		filePage.add(quickShare,BorderLayout.SOUTH);
-		return filePage;
 	}
 
 	private void getInNextLevel(Object id,ClientEnd clientEnd,JPanel fileContent) throws Exception {
@@ -196,46 +202,12 @@ public class MyCloud extends JFrame{
 		clientEnd.getFileDetails(ID, new CallBackFunc() {
 			@Override
 			public void done(CallBackFunArg callBackFunArg) throws Exception {
-				fileContent.removeAll();
 				JSONObject obj = callBackFunArg.jsonObject;
-				JSONArray  children = (JSONArray) obj.get("children");
+				//JSONArray  children = (JSONArray) obj.get("children");
 				String temp = showFileWay.getText()+"/"+obj.get("name");
 				showFileWay.setText(temp);
 				path = obj.get("fullPath").toString();
-
-				GridBagLayout fileBag = new GridBagLayout();
-				fileContent.setLayout(fileBag);
-				GridBagConstraints fileConstraints=new GridBagConstraints();
-				fileConstraints.fill=GridBagConstraints.BOTH;
-				fileConstraints.insets=new Insets(20,20,20,20);
-
-				for(int i=0;i<children.size();i++){
-					JSONObject o = (JSONObject) children.get(i);
-					JButton b = new JButton(o.get("name").toString());
-					if(o.get("type").toString() == "FOLDER") b.setIcon(folder);
-					else b.setIcon(txt);
-					b.setBackground(Color.white);
-					b.setBorder(BorderFactory.createLineBorder(Color.white));
-					b.addMouseListener(new MouseAdapter() {
-						@Override
-						public void mouseClicked(MouseEvent e) {
-							if(e.getClickCount() == 2 && o.get("type") == "FOLDER") {
-								try {
-									getInNextLevel(o.get("id"),clientEnd,fileCards);
-								} catch (Exception ex) {
-									ex.printStackTrace();
-								}
-							}
-							//else if(e.getClickCount() == 2 && o.get("type") == "FILE") openFile(obj.get("id"));
-						}
-					});
-					MouseListener popupListener = rightClick(o.get("id"),fileContent,b);
-					b.addMouseListener(popupListener);
-
-					fileBag.setConstraints(b,fileConstraints);
-					if(i%10 == 0) fileConstraints.gridwidth=GridBagConstraints.REMAINDER;
-					else fileConstraints.gridwidth = 1;
-				}
+				showFile(path);
 			}
 		});
 	}

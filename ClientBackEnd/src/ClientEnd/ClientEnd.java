@@ -130,7 +130,7 @@ public class ClientEnd extends Thread {
     public void getFileList(String path, CallBackFunc callBackFunc) throws Exception {
 //        final MediaType JSON = MediaType.parse("application/json");
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/folders/" + path)
+                .url(this.url + ':' + this.port + "/folders" + path)
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -142,7 +142,8 @@ public class ClientEnd extends Thread {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    callBackFunc.done(new CallBackFunArg(true, JSON.parseObject(response.body().toString()), null));
+                    System.out.println(response.body().toString());
+                    callBackFunc.done(new CallBackFunArg(true, JSON.parseObject(response.body().string()), null));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -153,7 +154,7 @@ public class ClientEnd extends Thread {
 
     public void createFolder(String path, CallBackFunc callBackFunc) throws Exception {
         Request request = new Request.Builder()
-                .url(this.getUrl() + ':' + this.getPort() + "/folders/" + path)
+                .url(this.getUrl() + ':' + this.getPort() + "/folders" + path)
                 .post(RequestBody.create(MediaType.parse("application/json"), ""))
                 .build();
 
@@ -255,11 +256,11 @@ public class ClientEnd extends Thread {
             RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("file", file.getName(),
                             RequestBody.create(MediaType.parse(fileType), file))
-                    .addFormDataPart("some-field", "some-value")
+                    .addFormDataPart("fullPath", fullPath)
                     .build();
 
             Request request = new Request.Builder()
-                    .url(this.url + ':' + this.port + "/files/" + fullPath + file.getName())
+                    .url(this.url + ':' + this.port + "/files")
                     .post(requestBody)
                     .build();
 
