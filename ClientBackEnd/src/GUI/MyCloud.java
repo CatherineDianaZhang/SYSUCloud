@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,8 +21,7 @@ public class MyCloud extends JFrame{
 	private ImageIcon txt;
 	private JTextField showFileWay;
 	private String path;
-	private JPanel fileCards;
-	private CardLayout fileCard;
+	private JPanel fileContent;
 	private ClientEnd clientEnd;
 	
 	public MyCloud(Frame cloud, ClientEnd clientEnd) {
@@ -63,7 +63,7 @@ public class MyCloud extends JFrame{
 		JScrollPane files = new JScrollPane();
 		JPanel quickShare = new JPanel();
 		//addressAndUpdate
-		addressAndUpdate.setPreferredSize(new Dimension(770,30));
+		addressAndUpdate.setPreferredSize(new Dimension(760,30));
 		addressAndUpdate.setBackground(Color.white);
 		GridBagLayout bag = new GridBagLayout();
 		addressAndUpdate.setLayout(bag);
@@ -73,7 +73,7 @@ public class MyCloud extends JFrame{
 		constraints.weightx = 1;
 
 		showFileWay = new JTextField("ÎÒµÄÍøÅÌ");
-		showFileWay.setPreferredSize(new Dimension(630,30));
+		showFileWay.setPreferredSize(new Dimension(620,30));
 		showFileWay.setBackground(Color.white);
 		showFileWay.setBorder(BorderFactory.createLineBorder(Color.white));
 		showFileWay.setForeground(Color.gray);
@@ -102,13 +102,22 @@ public class MyCloud extends JFrame{
 		updateButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				/*clientEnd.upload(file,new CallBackFunc() {
-					@Override
-					public void done(CallBackFunArg callBackFunArg) throws Exception {
+				JFileChooser f = new JFileChooser("F:\\");
+				int val = f.showOpenDialog(null);
+				File file = null;
+				if(val == f.APPROVE_OPTION) file = f.getSelectedFile();
+				try {
+					clientEnd.upload(file,path,new CallBackFunc() {
+						@Override
+						public void done(CallBackFunArg callBackFunArg) throws Exception {
+							if(callBackFunArg.bool){
 
-					}
-				});*/
+							}
+						}
+					});
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 		});
 		bag.setConstraints(updateButton,constraints);
@@ -117,15 +126,10 @@ public class MyCloud extends JFrame{
 		//files
 		files.setBorder(BorderFactory.createMatteBorder(0,0,1,0,Color.lightGray));
 		files.setPreferredSize(new Dimension(770,400));
-		JPanel fileContent = new JPanel();
+		fileContent = new JPanel();
 		fileContent.setPreferredSize(new Dimension(760,390));
 		fileContent.setBackground(Color.white);
-
-		fileCards = new JPanel(new CardLayout());
-		fileCards.add(fileContent,"root");
-		fileCard = (CardLayout)(fileCards.getLayout());
-		fileCard.show(fileCards, "root");
-		files.setViewportView(fileCards);
+		files.setViewportView(fileContent);
 
 		GridBagLayout fileBag = new GridBagLayout();
 		fileContent.setLayout(fileBag);
@@ -152,7 +156,7 @@ public class MyCloud extends JFrame{
 							public void mouseClicked(MouseEvent e) {
 								if(e.getClickCount() == 2 && obj.get("type") == "FOLDER") {
 									try {
-										getInNextLevel(obj.get("id"),clientEnd,fileCards);
+										getInNextLevel(obj.get("id"),clientEnd,fileContent);
 									} catch (Exception ex) {
 										ex.printStackTrace();
 									}
@@ -187,23 +191,20 @@ public class MyCloud extends JFrame{
 		return filePage;
 	}
 
-	private void getInNextLevel(Object id,ClientEnd clientEnd,JPanel fileCards) throws Exception {
+	private void getInNextLevel(Object id,ClientEnd clientEnd,JPanel fileContent) throws Exception {
 		int ID = (int)id;
 		clientEnd.getFileDetails(ID, new CallBackFunc() {
 			@Override
 			public void done(CallBackFunArg callBackFunArg) throws Exception {
+				fileContent.removeAll();
 				JSONObject obj = callBackFunArg.jsonObject;
 				JSONArray  children = (JSONArray) obj.get("children");
 				String temp = showFileWay.getText()+"/"+obj.get("name");
 				showFileWay.setText(temp);
-				JPanel levelContent = new JPanel();
-				fileCards.add(levelContent,obj.get("fullPath").toString());
-				CardLayout fileCard = (CardLayout)(fileCards.getLayout());
-				fileCard.show(fileCards, obj.get("fullPath").toString());
 				path = obj.get("fullPath").toString();
 
 				GridBagLayout fileBag = new GridBagLayout();
-				levelContent.setLayout(fileBag);
+				fileContent.setLayout(fileBag);
 				GridBagConstraints fileConstraints=new GridBagConstraints();
 				fileConstraints.fill=GridBagConstraints.BOTH;
 				fileConstraints.insets=new Insets(20,20,20,20);
@@ -228,7 +229,7 @@ public class MyCloud extends JFrame{
 							//else if(e.getClickCount() == 2 && o.get("type") == "FILE") openFile(obj.get("id"));
 						}
 					});
-					MouseListener popupListener = rightClick(o.get("id"),levelContent,b);
+					MouseListener popupListener = rightClick(o.get("id"),fileContent,b);
 					b.addMouseListener(popupListener);
 
 					fileBag.setConstraints(b,fileConstraints);
@@ -239,7 +240,7 @@ public class MyCloud extends JFrame{
 		});
 	}
 
-	private MouseListener rightClick(Object id,JPanel levelContent,JButton button){
+	private MouseListener rightClick(Object id,JPanel content,JButton button){
 		int ID = (int)id;
 		//ÓÒ¼üµ¯³öÏÂÔØ¡¢·ÖÏí¡¢É¾³ý
 		JPopupMenu jPopupMenuOne = new JPopupMenu();
@@ -248,7 +249,7 @@ public class MyCloud extends JFrame{
 		down.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				levelContent.remove(button);
+
 			}
 		});
 		jPopupMenuOne.add(down);
@@ -270,7 +271,8 @@ public class MyCloud extends JFrame{
 					clientEnd.delFile(ID, new CallBackFunc() {
 						@Override
 						public void done(CallBackFunArg callBackFunArg) throws Exception {
-
+							content.remove(button);
+							content.revalidate();
 						}
 					});
 				} catch (Exception ex) {

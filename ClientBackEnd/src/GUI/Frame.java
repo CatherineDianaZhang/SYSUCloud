@@ -19,6 +19,7 @@ public class Frame extends JFrame{
         Frame cloud = new Frame();
 		ClientEnd clientEnd = new ClientEnd();
         SignIn signIn = new SignIn(cloud,clientEnd);
+        cloud.pack();
         cloud.setVisible(true);
     }
 }
