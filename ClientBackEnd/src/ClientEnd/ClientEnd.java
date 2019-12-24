@@ -229,12 +229,17 @@ public class ClientEnd extends Thread {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 e.printStackTrace();
+                try {
+                    callBackFunc.done(new CallBackFunArg(false, null, null));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    callBackFunc.done(new CallBackFunArg(false, null, JSON.parseArray(response.body().string())));
+                    callBackFunc.done(new CallBackFunArg(true, null, JSON.parseArray(response.body().string())));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -242,7 +247,7 @@ public class ClientEnd extends Thread {
         });
     }
 
-    public void upload(File file, CallBackFunc callBackFunc) throws Exception {
+    public void upload(File file, String fullPath, CallBackFunc callBackFunc) throws Exception {
             Magic parser = new Magic();
             MagicMatch match = parser.getMagicMatch(file, false);
             String fileType = match.getMimeType() ;
@@ -254,7 +259,7 @@ public class ClientEnd extends Thread {
                     .build();
 
             Request request = new Request.Builder()
-                    .url(this.url + ':' + this.port + "/files/")
+                    .url(this.url + ':' + this.port + "/files/" + fullPath + file.getName())
                     .post(requestBody)
                     .build();
 
@@ -262,6 +267,11 @@ public class ClientEnd extends Thread {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     e.printStackTrace();
+                    try {
+                        callBackFunc.done(new CallBackFunArg(false, null, null));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 }
 
                 @Override
