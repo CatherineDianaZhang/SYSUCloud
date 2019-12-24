@@ -8,15 +8,23 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 
 public class ClientEnd extends Thread {
     private static String url = "http://cloud.sysu.rwong.tech";
     private static final OkHttpClient client = new OkHttpClient();
+    private static final CookieManager cookieManager = new CookieManager();
     private static int port = 8080;
 
     public String getUrl() {return this.url;}
     public int getPort() {return this.port;}
     public OkHttpClient getClient() {return this.client;}
+
+    public void OKHttpClient(){
+        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+        //client.(cookieManager);
+    }
 
     public void logOut(CallBackFunc callBackFunc) throws Exception {
         Request request = new Request.Builder()
