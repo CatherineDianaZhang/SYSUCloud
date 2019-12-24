@@ -17,8 +17,8 @@ public class MyCloud extends JFrame{
 	
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private ImageIcon folder = new ImageIcon("folder.png");
-	private ImageIcon txt = new ImageIcon("txt.png");;
+	private ImageIcon folder = new ImageIcon("./folder.png");
+	private ImageIcon txt = new ImageIcon("./txt.png");
 	private JTextField showFileWay;
 	private String path;
 	private JPanel fileContent;
@@ -125,10 +125,10 @@ public class MyCloud extends JFrame{
 		addressAndUpdate.add(updateButton);
 
 		//files
-		files.setBorder(BorderFactory.createMatteBorder(0,0,1,0,Color.lightGray));
-		files.setPreferredSize(new Dimension(770,400));
+		//files.setBorder(BorderFactory.createMatteBorder(0,0,1,0,Color.lightGray));
+		//files.setPreferredSize(new Dimension(770,400));
 		fileContent = new JPanel();
-		fileContent.setPreferredSize(new Dimension(760,390));
+		//fileContent.setPreferredSize(new Dimension(760,390));
 		fileContent.setBackground(Color.white);
 		files.setViewportView(fileContent);
 
@@ -146,7 +146,7 @@ public class MyCloud extends JFrame{
 		//添加三个页面
 		filePage.add(addressAndUpdate,BorderLayout.NORTH);
 		filePage.add(files);
-		filePage.add(quickShare,BorderLayout.SOUTH);
+		//filePage.add(quickShare,BorderLayout.SOUTH);
 		return filePage;
 	}
 
@@ -162,6 +162,7 @@ public class MyCloud extends JFrame{
 			clientEnd.getFileList(path,new CallBackFunc() {
 				@Override
 				public void done(CallBackFunArg callBackFunArg) throws Exception{
+					System.out.println(callBackFunArg.jsonObject.toJSONString());
 					JSONArray fileList = callBackFunArg.jsonObject.getJSONArray("children");
 					//System.out.println(fileList.size());
 					for(int i=0;i<fileList.size();i++){
