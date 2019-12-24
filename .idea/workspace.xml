@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="9d526625-66e2-42a9-a697-74135317d822" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ClientBackEnd/src/ClientEnd/ClientEnd.java" beforeDir="false" afterPath="$PROJECT_DIR$/ClientBackEnd/src/ClientEnd/ClientEnd.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ClientBackEnd/src/GUI/MyCloud.java" beforeDir="false" afterPath="$PROJECT_DIR$/ClientBackEnd/src/GUI/MyCloud.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -24,7 +23,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/ClientBackEnd/lib/okio-2.2.2.jar!/" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/ClientBackEnd" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -73,6 +72,7 @@
       <updated>1577102648327</updated>
       <workItem from="1577157103349" duration="4898000" />
       <workItem from="1577164815094" duration="6650000" />
+      <workItem from="1577180359039" duration="445000" />
     </task>
     <task id="LOCAL-00001" summary="GUI">
       <created>1577118023975</created>
@@ -128,10 +128,10 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="263" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1577174044819" />
-    <state x="436" y="110" key="FileChooserDialogImpl" timestamp="1577112853924">
+    <state x="436" y="110" key="FileChooserDialogImpl" timestamp="1577180373931">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="436" y="110" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1577112853924" />
+    <state x="436" y="110" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1577180373931" />
     <state x="740" y="280" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1577102668275" />
     <state width="1222" height="57" key="GridCell.Tab.0.bottom" timestamp="1577175921209">
       <screen x="0" y="0" width="1280" height="680" />
@@ -153,10 +153,10 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="242" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1577174394126" />
-    <state x="337" y="169" key="com.intellij.ide.util.TipDialog" timestamp="1577164814382">
+    <state x="337" y="169" key="com.intellij.ide.util.TipDialog" timestamp="1577180358610">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="337" y="169" key="com.intellij.ide.util.TipDialog/0.0.1280.680@0.0.1280.680" timestamp="1577164814382" />
+    <state x="337" y="169" key="com.intellij.ide.util.TipDialog/0.0.1280.680@0.0.1280.680" timestamp="1577180358610" />
     <state x="297" y="151" key="run.anything.popup" timestamp="1577114652559">
       <screen x="0" y="0" width="1280" height="680" />
     </state>

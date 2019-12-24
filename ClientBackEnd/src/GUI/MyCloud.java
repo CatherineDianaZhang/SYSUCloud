@@ -5,6 +5,7 @@ import ClientEnd.CallBackFunc;
 import ClientEnd.CallBackFunArg;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import javafx.beans.binding.BooleanExpression;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -17,8 +18,8 @@ public class MyCloud extends JFrame{
 	
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private ImageIcon folder = new ImageIcon("./folder.png");
-	private ImageIcon txt = new ImageIcon("./txt.png");
+	private ImageIcon folder = new ImageIcon("C:\\Users\\Catherine\\Desktop\\SYSUCloud\\folder.png");
+	private ImageIcon txt = new ImageIcon("C:\\Users\\Catherine\\Desktop\\SYSUCloud\\txt.png");
 	private JTextField showFileWay;
 	private String path;
 	private JPanel fileContent;
@@ -86,11 +87,15 @@ public class MyCloud extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				int index1 = path.lastIndexOf("/");
-				String newPath = path.substring(0,index1);
-				showFile(newPath);
-				path = newPath;
-				String newPath2 = showFileWay.getText().substring(0,showFileWay.getText().lastIndexOf("/"));
-				showFileWay.setText(newPath2);
+				String newPath = path.substring(0,index1-1);
+				System.out.println(newPath);
+				int index2 = newPath.lastIndexOf("/");
+				String newPath2 = newPath.substring(0,index2);
+				System.out.println(newPath2);
+				showFile(newPath2);
+				path = newPath2;
+				String newPath3 = showFileWay.getText().substring(0,showFileWay.getText().lastIndexOf("/"));
+				showFileWay.setText(newPath3);
 			}
 		});
 		bag.setConstraints(backButton,constraints);
@@ -125,13 +130,37 @@ public class MyCloud extends JFrame{
 		addressAndUpdate.add(updateButton);
 
 		//files
-		//files.setBorder(BorderFactory.createMatteBorder(0,0,1,0,Color.lightGray));
-		//files.setPreferredSize(new Dimension(770,400));
+		files.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.white));
+		files.setPreferredSize(new Dimension(770,500));
 		fileContent = new JPanel();
 		//fileContent.setPreferredSize(new Dimension(760,390));
 		fileContent.setBackground(Color.white);
 		files.setViewportView(fileContent);
 
+		//右键点击新建文件夹
+		JPopupMenu jPopupMenuOne=new JPopupMenu();
+		JMenuItem create=new JMenuItem("新建文件夹");
+		create.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFrame dialog = new JFrame();
+				String name = JOptionPane.showInputDialog(dialog, "请输入文件夹名称", "输入文件夹名称", 1);
+				String temp = path+name+"/";
+				try {
+					clientEnd.createFolder(temp, new CallBackFunc() {
+						@Override
+						public void done(CallBackFunArg callBackFunArg) throws Exception {
+							if(callBackFunArg.bool) showFile(path);
+						}
+					});
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		jPopupMenuOne.add(create);
+		MouseListener popupListener=new PopupListener(jPopupMenuOne);
+		fileContent.addMouseListener(popupListener);
 			//文件列表
 		showFile("/");
 				
@@ -145,7 +174,7 @@ public class MyCloud extends JFrame{
 	    
 		//添加三个页面
 		filePage.add(addressAndUpdate,BorderLayout.NORTH);
-		filePage.add(files);
+		filePage.add(files, BorderLayout.SOUTH);
 		//filePage.add(quickShare,BorderLayout.SOUTH);
 		return filePage;
 	}
@@ -156,8 +185,9 @@ public class MyCloud extends JFrame{
 		GridBagLayout fileBag = new GridBagLayout();
 		fileContent.setLayout(fileBag);
 		GridBagConstraints fileConstraints=new GridBagConstraints();
-		fileConstraints.fill=GridBagConstraints.BOTH;
-		fileConstraints.insets=new Insets(20,20,20,20);
+		fileConstraints.anchor = GridBagConstraints.WEST;
+		fileConstraints.fill=GridBagConstraints.NONE;
+		fileConstraints.insets=new Insets(10,10,10,10);
 		try {
 			clientEnd.getFileList(path,new CallBackFunc() {
 				@Override
@@ -167,17 +197,20 @@ public class MyCloud extends JFrame{
 					//System.out.println(fileList.size());
 					for(int i=0;i<fileList.size();i++){
 						JSONObject obj = (JSONObject) fileList.get(i);
-						JButton b = new JButton(obj.get("name").toString());
-						if(obj.get("type").toString() == "FOLDER") b.setIcon(folder);
+						JButton b = new JButton(obj.getString("name"));
+						if(obj.get("type").toString().equals("FOLDER")) b.setIcon(folder);
 						else b.setIcon(txt);
-						//b.setBackground(Color.white);
+						b.setVerticalTextPosition(JButton.BOTTOM);
+						b.setHorizontalTextPosition(JButton.CENTER);
+						b.setBackground(Color.white);
 						b.setBorder(BorderFactory.createLineBorder(Color.white));
+						b.setPreferredSize(new Dimension(90,100));
 						b.addMouseListener(new MouseAdapter() {
 							@Override
 							public void mouseClicked(MouseEvent e) {
-								if(e.getClickCount() == 2 && obj.get("type") == "FOLDER") {
+								if(e.getClickCount() == 2 && obj.get("type").toString().equals("FOLDER")) {
 									try {
-										getInNextLevel(obj.get("id"),clientEnd,fileContent);
+										getInNextLevel(obj.getString("fullPath"),clientEnd,fileContent);
 									} catch (Exception ex) {
 										ex.printStackTrace();
 									}
@@ -201,16 +234,15 @@ public class MyCloud extends JFrame{
 		}
 	}
 
-	private void getInNextLevel(Object id,ClientEnd clientEnd,JPanel fileContent) throws Exception {
-		int ID = (int)id;
-		clientEnd.getFileDetails(ID, new CallBackFunc() {
+	private void getInNextLevel(String p,ClientEnd clientEnd,JPanel fileContent) throws Exception {
+		clientEnd.getFileList(p, new CallBackFunc() {
 			@Override
 			public void done(CallBackFunArg callBackFunArg) throws Exception {
 				JSONObject obj = callBackFunArg.jsonObject;
 				//JSONArray  children = (JSONArray) obj.get("children");
-				String temp = showFileWay.getText()+"/"+obj.get("name");
+				String temp = showFileWay.getText()+"/"+obj.getString("name");
 				showFileWay.setText(temp);
-				path = obj.get("fullPath").toString();
+				path = obj.getString("fullPath");
 				showFile(path);
 			}
 		});
@@ -225,7 +257,15 @@ public class MyCloud extends JFrame{
 		down.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				try {
+					clientEnd.download(ID, new CallBackFunc() {
+						@Override
+						public void done(CallBackFunArg callBackFunArg) throws Exception {
+						}
+					});
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 		});
 		jPopupMenuOne.add(down);
@@ -247,8 +287,9 @@ public class MyCloud extends JFrame{
 					clientEnd.delFile(ID, new CallBackFunc() {
 						@Override
 						public void done(CallBackFunArg callBackFunArg) throws Exception {
-							content.remove(button);
-							content.revalidate();
+							if(callBackFunArg.bool) {
+								showFile(path);
+							}
 						}
 					});
 				} catch (Exception ex) {
