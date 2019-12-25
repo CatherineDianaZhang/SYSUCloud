@@ -7,7 +7,9 @@ import com.alibaba.fastjson.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -239,7 +241,7 @@ public class ClientEnd extends Thread {
 
     }
 
-    public void download(int fileId, CallBackFunc callBackFunc) throws Exception {
+    public void download(int fileId, String fileName, String savaPath, CallBackFunc callBackFunc, CallBackFunc progressLength) throws Exception {
         Request request = new Request.Builder()
                 .url(this.url + ':' + this.port + "/files/" + fileId)
                 .build();
@@ -256,10 +258,41 @@ public class ClientEnd extends Thread {
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                InputStream is = null;
+                FileOutputStream fos = null;
+                int len = 0;
+                byte[] buf = new byte[2048];
                 try {
+                    is = response.body().byteStream();
+                    File file = new File(savaPath, fileName);
+                    fos = new FileOutputStream(file);
+                    long total = response.body().contentLength();
+                    long sum = 0;
+                    while ((len = is.read(buf)) != -1) {
+                        fos.write(buf, 0, len);
+                        sum += len;
+                        int progress = (int) (sum * 1.0f / total * 100);
+                        JSONObject pLength = new JSONObject();
+                        pLength.put("length", progress);
+                        progressLength.done(new CallBackFunArg(true, pLength, null));
+                        // try to finish progress length
+                    }
+                    fos.flush();
                     callBackFunc.done(new CallBackFunArg(true, null, JSON.parseArray(response.body().string())));
-                } catch (Exception e) {
+                } catch (IOException e) {
                     e.printStackTrace();
+                } catch (Exception e) {
+                    try {
+                        callBackFunc.done(new CallBackFunArg(false, null, null));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                } finally {
+                    try {
+                        if (is != null) is.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
