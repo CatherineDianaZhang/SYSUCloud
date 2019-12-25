@@ -3,7 +3,7 @@ package GUI;
 import ClientEnd.CallBackFunArg;
 import ClientEnd.CallBackFunc;
 import ClientEnd.ClientEnd;
-import com.sun.security.ntlm.Client;
+//import com.sun.security.ntlm.Client;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

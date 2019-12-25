@@ -243,7 +243,7 @@ public class ClientEnd extends Thread {
 
     public void download(int fileId, String fileName, String savaPath, CallBackFunc callBackFunc, CallBackFunc progressLength) throws Exception {
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/files/" + fileId)
+                .url(this.url + ':' + this.port + "/files/" + fileId +"/download/")
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override

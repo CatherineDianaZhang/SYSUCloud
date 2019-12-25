@@ -5,7 +5,7 @@ import ClientEnd.CallBackFunc;
 import ClientEnd.CallBackFunArg;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import javafx.beans.binding.BooleanExpression;
+//import javafx.beans.binding.BooleanExpression;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -258,9 +258,17 @@ public class MyCloud extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					clientEnd.download(ID, new CallBackFunc() {
+					// TODO
+					// 这里记得改一下
+					clientEnd.download(ID, "test.txt", "D:/download", new CallBackFunc() {
 						@Override
 						public void done(CallBackFunArg callBackFunArg) throws Exception {
+							System.out.println("download " + callBackFunArg.bool + " !");
+						}
+					}, new CallBackFunc() {
+						@Override
+						public void done(CallBackFunArg callBackFunArg) throws Exception {
+							System.out.println(callBackFunArg.jsonObject.get("length"));
 						}
 					});
 				} catch (Exception ex) {

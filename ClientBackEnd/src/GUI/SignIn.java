@@ -9,7 +9,7 @@ import javax.swing.border.*;
 import ClientEnd.CallBackFunc;
 import ClientEnd.CallBackFunArg;
 import ClientEnd.ClientEnd;
-import com.sun.corba.se.pept.protocol.ClientDelegate;
+//import com.sun.corba.se.pept.protocol.ClientDelegate;
 
 
 public class SignIn extends JFrame{

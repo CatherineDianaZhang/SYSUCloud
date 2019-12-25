@@ -19,4 +19,8 @@ public class CallBackFunArg {
         this.jsonObject = jsonObject == null ? null : (JSONObject) jsonObject.clone();
         this.jsonArray = jsonArray == null ? null : (JSONArray) jsonArray.clone();
     }
+
+    public JSONObject getJsonObject() {return this.jsonObject;}
+    public JSONArray getJsonArray() {return this.jsonArray;}
+    public boolean getBool() {return this.bool;}
 }
