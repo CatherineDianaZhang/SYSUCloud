@@ -10,8 +10,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Time;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ClientEnd extends Thread {
     private static String url = "http://cloud.sysu.rwong.tech";
@@ -30,6 +32,9 @@ public class ClientEnd extends Thread {
                     return sessionCookie;
                 }
             })
+            .connectTimeout(1, TimeUnit.DAYS)
+            .writeTimeout(1, TimeUnit.DAYS)
+            .readTimeout(1, TimeUnit.DAYS)
             .build();
     private static int port = 8080;
 
@@ -52,10 +57,11 @@ public class ClientEnd extends Thread {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    System.out.println(response.code());
                     callBackFunc.done(new CallBackFunArg(true, null, null));
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    response.body().close();
                 }
             }
         });
@@ -99,6 +105,7 @@ public class ClientEnd extends Thread {
                     case 400: throw new IOException("用户密码错误");
                     default: throw new IOException("我也不知道什么问题: " + response.code());
                 }
+                response.body().close();
             }
         });
 
@@ -141,6 +148,7 @@ public class ClientEnd extends Thread {
                     case 401: throw new IOException("用户已经存在");
                     default: throw new IOException("我也不知道什么问题: " + response.code());
                 }
+                response.body().close();
             }
         });
 
@@ -161,8 +169,9 @@ public class ClientEnd extends Thread {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    System.out.println(response.body().toString());
-                    callBackFunc.done(new CallBackFunArg(true, JSON.parseObject(response.body().string()), null));
+                    ResponseBody body = response.body();
+                    callBackFunc.done(new CallBackFunArg(true, JSON.parseObject(body.string()), null));
+                    body.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -189,6 +198,8 @@ public class ClientEnd extends Thread {
                     callBackFunc.done(new CallBackFunArg(true, null, null));
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    response.body().close();
                 }
             }
         });
@@ -209,7 +220,9 @@ public class ClientEnd extends Thread {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    callBackFunc.done(new CallBackFunArg(false, JSONObject.parseObject(response.body().string()), null));
+                    ResponseBody body = response.body();
+                    callBackFunc.done(new CallBackFunArg(false, JSONObject.parseObject(body.string()), null));
+                    body.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -233,6 +246,7 @@ public class ClientEnd extends Thread {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
                     callBackFunc.done(new CallBackFunArg(response.code() == 200, null, null));
+                    response.body().close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -241,7 +255,7 @@ public class ClientEnd extends Thread {
 
     }
 
-    public void download(int fileId, String fileName, String savaPath, CallBackFunc callBackFunc, CallBackFunc progressLength) throws Exception {
+    public void download(int fileId, String savePath, CallBackFunc callBackFunc, CallBackFunc progressLength) throws Exception {
         Request request = new Request.Builder()
                 .url(this.url + ':' + this.port + "/files/" + fileId +"/download/")
                 .build();
@@ -263,10 +277,12 @@ public class ClientEnd extends Thread {
                 int len = 0;
                 byte[] buf = new byte[2048];
                 try {
-                    is = response.body().byteStream();
-                    File file = new File(savaPath, fileName);
+                    ResponseBody body = response.body();
+                    assert body != null;
+                    is = body.byteStream();
+                    File file = new File(savePath);
                     fos = new FileOutputStream(file);
-                    long total = response.body().contentLength();
+                    long total = body.contentLength();
                     long sum = 0;
                     while ((len = is.read(buf)) != -1) {
                         fos.write(buf, 0, len);
@@ -278,7 +294,9 @@ public class ClientEnd extends Thread {
                         // try to finish progress length
                     }
                     fos.flush();
-                    callBackFunc.done(new CallBackFunArg(true, null, JSON.parseArray(response.body().string())));
+                    fos.close();
+                    body.close();
+                    callBackFunc.done(new CallBackFunArg(true, null, null));
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (Exception e) {
@@ -298,13 +316,24 @@ public class ClientEnd extends Thread {
         });
     }
 
-    public void upload(File file, String fullPath, CallBackFunc callBackFunc) throws Exception {
+    public void upload(File file, String fullPath, CallBackFunc callBackFunc, CallBackFunc progressLength) throws Exception {
             MagicMatch match = Magic.getMagicMatch(file, false);
             String fileType = match.getMimeType();
 
             RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("file", file.getName(),
-                            RequestBody.create(MediaType.parse(fileType), file))
+                            new CountingFileRequestBody(file, fileType, new CountingFileRequestBody.ProgressListener() {
+                                @Override
+                                public void transferred(int percent) {
+                                    JSONObject pLength = new JSONObject();
+                                    pLength.put("length", percent);
+                                    try {
+                                        progressLength.done(new CallBackFunArg(true, pLength, null));
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }))
                     .addFormDataPart("fullPath", fullPath + file.getName())
                     .build();
 
@@ -327,11 +356,11 @@ public class ClientEnd extends Thread {
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                     try {
-                        System.out.println(response.code());
-                        System.out.println(response.body().string());
                         callBackFunc.done(new CallBackFunArg(true, null, null));
                     } catch (Exception e) {
                         e.printStackTrace();
+                    } finally {
+                        response.body().close();
                     }
                 }
             });

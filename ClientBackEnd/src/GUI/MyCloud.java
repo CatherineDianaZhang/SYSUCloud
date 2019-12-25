@@ -86,6 +86,9 @@ public class MyCloud extends JFrame{
 		backButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (path.equals("/")) {
+					return;
+				}
 				int index1 = path.lastIndexOf("/");
 				String newPath = path.substring(0,index1-1);
 				System.out.println(newPath);
@@ -111,13 +114,29 @@ public class MyCloud extends JFrame{
 				File file = null;
 				if(val == f.APPROVE_OPTION) {
 					file = f.getSelectedFile();
+					JFrame progressWin = new JFrame("上传进度");
+					JProgressBar progressBar = new JProgressBar();
+					progressBar.setValue(0);
+					progressBar.setStringPainted(true);
+					progressWin.setSize(360, 80);
+					progressWin.add(progressBar);
+					progressWin.setLocationRelativeTo(null);
+					progressWin.setVisible(true);
 					try {
-						clientEnd.upload(file,path,new CallBackFunc() {
+						clientEnd.upload(file, path, new CallBackFunc() {
 							@Override
 							public void done(CallBackFunArg callBackFunArg) throws Exception {
-								if(callBackFunArg.bool) showFile(path);
+								if (callBackFunArg.bool) showFile(path);
+								progressWin.setTitle("上传完成");
+								JOptionPane.showMessageDialog(progressWin, "上传完成");
+								progressWin.setVisible(false);
+								progressWin.dispose();
 								System.out.println(callBackFunArg.bool);
-								System.out.println(path);
+							}
+						}, new CallBackFunc() {
+							@Override
+							public void done(CallBackFunArg callBackFunArg) throws Exception {
+								progressBar.setValue((Integer) callBackFunArg.jsonObject.get("length"));
 							}
 						});
 					} catch (Exception ex) {
@@ -260,17 +279,34 @@ public class MyCloud extends JFrame{
 				try {
 					// TODO
 					// 这里记得改一下
-					clientEnd.download(ID, "test.txt", "D:/download", new CallBackFunc() {
-						@Override
-						public void done(CallBackFunArg callBackFunArg) throws Exception {
-							System.out.println("download " + callBackFunArg.bool + " !");
-						}
-					}, new CallBackFunc() {
-						@Override
-						public void done(CallBackFunArg callBackFunArg) throws Exception {
-							System.out.println(callBackFunArg.jsonObject.get("length"));
-						}
-					});
+					JFileChooser fileChooser = new JFileChooser();
+					fileChooser.setSelectedFile(new File(button.getText()));
+					int userChoice = fileChooser.showSaveDialog(content);
+					if (userChoice == JFileChooser.APPROVE_OPTION) {
+						File selectedFile = fileChooser.getSelectedFile();
+						JFrame progressWin = new JFrame("下载进度");
+						JProgressBar progressBar = new JProgressBar();
+						progressBar.setValue(0);
+						progressBar.setStringPainted(true);
+						progressWin.setSize(360, 80);
+						progressWin.add(progressBar);
+						progressWin.setLocationRelativeTo(null);
+						progressWin.setVisible(true);
+						clientEnd.download(ID, selectedFile.getAbsolutePath(), new CallBackFunc() {
+							@Override
+							public void done(CallBackFunArg callBackFunArg) throws Exception {
+								progressWin.setTitle("下载完成");
+								JOptionPane.showMessageDialog(progressWin, "下载完成");
+								progressWin.setVisible(false);
+								progressWin.dispose();
+							}
+						}, new CallBackFunc() {
+							@Override
+							public void done(CallBackFunArg callBackFunArg) throws Exception {
+								progressBar.setValue((Integer) callBackFunArg.jsonObject.get("length"));
+							}
+						});
+					}
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
