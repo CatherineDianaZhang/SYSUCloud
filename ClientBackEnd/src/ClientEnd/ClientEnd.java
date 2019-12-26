@@ -337,4 +337,27 @@ public class ClientEnd extends Thread {
             });
 
     }
+
+    public void shareFile(int fileId, CallBackFunc callBackFunc) {
+        final MediaType JSON = MediaType.parse("application/json");
+        Request request = new Request.Builder()
+                .url(this.url + ':' + this.port + "/share/" + fileId)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try {
+                    callBackFunc.done(new CallBackFunArg(response.code() == 200, null, null));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
 }
