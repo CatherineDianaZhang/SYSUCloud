@@ -52,8 +52,8 @@ public class MyCloud extends JFrame{
 		JScrollPane sharePage = makeSharePage(cloud,clientEnd);
 		pages.addTab("我的分享", sharePage);
 		
-		JScrollPane transPage = makeTransPage(cloud,clientEnd);
-		pages.addTab("我的传输", transPage);
+		//JScrollPane transPage = makeTransPage(cloud,clientEnd);
+		//pages.addTab("我的传输", transPage);
 		
 		contentPane.add(pages);
 		
@@ -175,7 +175,7 @@ public class MyCloud extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFrame dialog = new JFrame();
-				String name = JOptionPane.showInputDialog(dialog, "请输入文件夹名称", "输入文件夹名称", 1);
+				String name = JOptionPane.showInputDialog(dialog, "请输入文件夹名称", "输入文件夹名称", JOptionPane.PLAIN_MESSAGE);
 				String temp = path+name+"/";
 				try {
 					clientEnd.createFolder(temp, new CallBackFunc() {
@@ -387,8 +387,14 @@ public class MyCloud extends JFrame{
 		/*clientEnd.getShareList(new CallBackFunc() {
 			@Override
 			public void done(CallBackFunArg callBackFunArg) throws Exception {
-				JSONObject list= callBackFunArg.jsonObject;
-
+				JSONArray list= callBackFunArg.jsonArray;
+				DefaultTableModel model = (DefaultTableModel)shareContent.getModel();
+				for(int i=0;i<list.size();i++){
+					JSONObject obj = list.get(i);
+					String temp = obj.getString("id");
+					String link = "http://fffeng.rwong.cc/share/"+temp;
+					model.addRow(new Object[]{obj.getString("name"),link,obj.getString("createdAt")});
+				}
 			}
 		});*/
 	}
