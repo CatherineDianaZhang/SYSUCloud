@@ -379,8 +379,14 @@ public class MyCloud extends JFrame{
 		/*clientEnd.getShareList(new CallBackFunc() {
 			@Override
 			public void done(CallBackFunArg callBackFunArg) throws Exception {
-				JSONObject list= callBackFunArg.jsonObject;
-
+				JSONArray list= callBackFunArg.jsonArray;
+				DefaultTableModel model = (DefaultTableModel)shareContent.getModel();
+				for(int i=0;i<list.size();i++){
+					JSONObject obj = list.get(i);
+					String temp = obj.getString("id");
+					String link = "http://fffeng.rwong.cc/share/"+temp;
+					model.addRow(new Object[]{obj.getString("name"),link,obj.getString("createdAt")});
+				}
 			}
 		});*/
 	}
