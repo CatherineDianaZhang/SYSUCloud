@@ -46,8 +46,8 @@ public class MyCloud extends JFrame{
 		JScrollPane sharePage = makeSharePage(cloud,clientEnd);
 		pages.addTab("我的分享", sharePage);
 		
-		JScrollPane transPage = makeTransPage(cloud,clientEnd);
-		pages.addTab("我的传输", transPage);
+		//JScrollPane transPage = makeTransPage(cloud,clientEnd);
+		//pages.addTab("我的传输", transPage);
 		
 		contentPane.add(pages);
 		
@@ -167,7 +167,7 @@ public class MyCloud extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFrame dialog = new JFrame();
-				String name = JOptionPane.showInputDialog(dialog, "请输入文件夹名称", "输入文件夹名称", 1);
+				String name = JOptionPane.showInputDialog(dialog, "请输入文件夹名称", "输入文件夹名称", JOptionPane.PLAIN_MESSAGE);
 				String temp = path+name+"/";
 				try {
 					clientEnd.createFolder(temp, new CallBackFunc() {
