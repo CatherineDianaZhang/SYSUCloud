@@ -35,8 +35,8 @@ public class MyCloud extends JFrame{
 		this.cloud = cloud;
 		cloud.setTitle("SYSUCloud");
 
-		this.folder = new ImageIcon(Paths.get("src/GUI/folder.png").toAbsolutePath().toString());
-		this.txt = new ImageIcon(Paths.get("src/GUI/txt.png").toAbsolutePath().toString());
+		this.folder = new ImageIcon(MyCloud.class.getResource("folder.png"));
+		this.txt = new ImageIcon(MyCloud.class.getResource("folder.png"));
 
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(0,0,0,0));
@@ -335,7 +335,7 @@ public class MyCloud extends JFrame{
 					@Override
 					public void done(CallBackFunArg callBackFunArg) throws Exception {
 						String temp = callBackFunArg.jsonObject.getString("id");
-						String link = "http://fffeng.rwong.cc:5750/share/"+temp;
+						String link = "http://cloud.sysu.rwong.tech:8080/share/"+temp;
 						JFrame linkWin = new JFrame("分享链接已生成，快去分享吧");
 						linkWin.setSize(360, 80);
 						linkWin.add(new JTextField(link));
@@ -411,7 +411,7 @@ public class MyCloud extends JFrame{
 					for(int i=0;i<list.size();i++){
 						JSONObject obj = (JSONObject) list.get(i);
 						String temp = obj.getString("id");
-						String link = "http://fffeng.rwong.cc:5750/share/"+temp;
+						String link = "http://cloud.sysu.rwong.tech:8080/share/"+temp;
 						model.addRow(new Object[]{obj.getString("name"),link,obj.getString("createdAt")});
 					}
 				}
