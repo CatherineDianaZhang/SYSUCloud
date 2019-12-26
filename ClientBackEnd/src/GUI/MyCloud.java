@@ -62,7 +62,7 @@ public class MyCloud extends JFrame{
 		cards.add(contentPane,"mainPage");
 		CardLayout card = (CardLayout)(cards.getLayout());
 		card.show(cards, "mainPage");
-
+		showShare();
 
 	}
 	
@@ -98,14 +98,15 @@ public class MyCloud extends JFrame{
 		backButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (path.equals("/")) {
+				System.out.println("Current: " + path);
+				if (path.equals("/") || path.equals("")) {
 					return;
 				}
 				int index1 = path.lastIndexOf("/");
-				String newPath = path.substring(0,index1-1);
+				String newPath = path.substring(0, index1);
 				System.out.println(newPath);
 				int index2 = newPath.lastIndexOf("/");
-				String newPath2 = newPath.substring(0,index2);
+				String newPath2 = newPath.substring(0, index2);
 				System.out.println(newPath2);
 				showFile(newPath2);
 				path = newPath2;
@@ -249,7 +250,7 @@ public class MyCloud extends JFrame{
 								//else if(e.getClickCount() == 2 && obj.get("type") == "FILE") openFile(obj.get("id"));
 							}
 						});
-						MouseListener popupListener = rightClick(obj.get("id"),obj.getString("type"),fileContent,b);
+						MouseListener popupListener = rightClick(obj.get("id"),obj.getString("type"), obj.getString("fullPath"), fileContent,b);
 						b.addMouseListener(popupListener);
 						fileBag.setConstraints(b,fileConstraints);
 						if(i%10 == 0) fileConstraints.gridwidth=GridBagConstraints.REMAINDER;
@@ -279,7 +280,7 @@ public class MyCloud extends JFrame{
 		});
 	}
 
-	private MouseListener rightClick(Object id,String type,JPanel content,JButton button){
+	private MouseListener rightClick(Object id,String type, String fullPath, JPanel content,JButton button){
 		int ID = (int)id;
 		//右键弹出下载、分享、删除
 		JPopupMenu jPopupMenuOne = new JPopupMenu();
@@ -289,8 +290,6 @@ public class MyCloud extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					// TODO
-					// 这里记得改一下
 					JFileChooser fileChooser = new JFileChooser();
 					fileChooser.setSelectedFile(new File(button.getText()));
 					int userChoice = fileChooser.showSaveDialog(content);
@@ -336,8 +335,12 @@ public class MyCloud extends JFrame{
 					@Override
 					public void done(CallBackFunArg callBackFunArg) throws Exception {
 						String temp = callBackFunArg.jsonObject.getString("id");
-						String link = "http://fffeng.rwong.cc/share/"+temp;
-						JOptionPane.showMessageDialog(null,link,"分享链接",JOptionPane.PLAIN_MESSAGE);
+						String link = "http://fffeng.rwong.cc:5750/share/"+temp;
+						JFrame linkWin = new JFrame("分享链接已生成，快去分享吧");
+						linkWin.setSize(360, 80);
+						linkWin.add(new JTextField(link));
+						linkWin.setLocationRelativeTo(null);
+						linkWin.setVisible(true);
 						showShare();
 					}
 				});
@@ -352,22 +355,32 @@ public class MyCloud extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					clientEnd.delFile(ID, new CallBackFunc() {
-						@Override
-						public void done(CallBackFunArg callBackFunArg) throws Exception {
-							if(callBackFunArg.bool) {
-								showFile(path);
+					if (type.equals("FILE")) {
+						clientEnd.delFile(ID, new CallBackFunc() {
+							@Override
+							public void done(CallBackFunArg callBackFunArg) throws Exception {
+								if(callBackFunArg.bool) {
+									showFile(path);
+								}
 							}
-						}
-					});
+						});
+					} else {
+						clientEnd.delFolder(fullPath, new CallBackFunc() {
+							@Override
+							public void done(CallBackFunArg callBackFunArg) throws Exception {
+								if(callBackFunArg.bool) {
+									showFile(path);
+								}
+							}
+						});
+					}
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
 			}
 		});
 		jPopupMenuOne.add(delete);
-		MouseListener temp = new PopupListener(jPopupMenuOne);
-		return temp;
+		return new PopupListener(jPopupMenuOne);
 	}
 
 	protected JScrollPane makeSharePage(JFrame cloud,ClientEnd clientEnd) {
@@ -384,19 +397,28 @@ public class MyCloud extends JFrame{
 	}
 
 	protected void showShare(){
-		/*clientEnd.getShareList(new CallBackFunc() {
-			@Override
-			public void done(CallBackFunArg callBackFunArg) throws Exception {
-				JSONArray list= callBackFunArg.jsonArray;
-				DefaultTableModel model = (DefaultTableModel)shareContent.getModel();
-				for(int i=0;i<list.size();i++){
-					JSONObject obj = list.get(i);
-					String temp = obj.getString("id");
-					String link = "http://fffeng.rwong.cc/share/"+temp;
-					model.addRow(new Object[]{obj.getString("name"),link,obj.getString("createdAt")});
+		try {
+			clientEnd.getShareList(new CallBackFunc() {
+				@Override
+				public void done(CallBackFunArg callBackFunArg) throws Exception {
+					JSONArray list= callBackFunArg.jsonArray;
+					DefaultTableModel model = (DefaultTableModel)shareContent.getModel();
+					if (model.getRowCount() > 0) {
+						for (int i = model.getRowCount() - 1; i > -1; i--) {
+							model.removeRow(i);
+						}
+					}
+					for(int i=0;i<list.size();i++){
+						JSONObject obj = (JSONObject) list.get(i);
+						String temp = obj.getString("id");
+						String link = "http://fffeng.rwong.cc:5750/share/"+temp;
+						model.addRow(new Object[]{obj.getString("name"),link,obj.getString("createdAt")});
+					}
 				}
-			}
-		});*/
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	protected JScrollPane makeTransPage(JFrame cloud,ClientEnd clientEnd) {

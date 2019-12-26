@@ -420,6 +420,30 @@ public class ClientEnd extends Thread {
         });
     }
 
+    public void getShareList(CallBackFunc callBackFunc) throws Exception {
+//        final MediaType JSON = MediaType.parse("application/json");
+        Request request = new Request.Builder()
+                .url(this.url + ':' + this.port + "/share")
+                .build();
 
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try {
+                    ResponseBody body = response.body();
+                    callBackFunc.done(new CallBackFunArg(true, null, JSON.parseArray(body.string())));
+                    body.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
     
 }
