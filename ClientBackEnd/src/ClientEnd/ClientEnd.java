@@ -340,8 +340,11 @@ public class ClientEnd extends Thread {
 
     public void shareFile(int fileId, CallBackFunc callBackFunc) {
         final MediaType JSON = MediaType.parse("application/json");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("fileId", fileId);
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/share/" + fileId)
+                .url(this.url + ':' + this.port + "/share/")
+                .post(RequestBody.create(MediaType.parse("application/json"), jsonObject.toString()))
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -352,12 +355,12 @@ public class ClientEnd extends Thread {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    callBackFunc.done(new CallBackFunArg(response.code() == 200, null, null));
+                    callBackFunc.done(new CallBackFunArg(response.code() == 200, JSONObject.parseObject(response.body().toString()), null));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-
     }
+    
 }
