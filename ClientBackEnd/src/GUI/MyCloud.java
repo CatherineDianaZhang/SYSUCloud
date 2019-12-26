@@ -237,7 +237,7 @@ public class MyCloud extends JFrame{
 								//else if(e.getClickCount() == 2 && obj.get("type") == "FILE") openFile(obj.get("id"));
 							}
 						});
-						MouseListener popupListener = rightClick(obj.get("id"),fileContent,b);
+						MouseListener popupListener = rightClick(obj.get("id"),obj.getString("type"),fileContent,b);
 						b.addMouseListener(popupListener);
 						fileBag.setConstraints(b,fileConstraints);
 						if(i%10 == 0) fileConstraints.gridwidth=GridBagConstraints.REMAINDER;
@@ -267,7 +267,7 @@ public class MyCloud extends JFrame{
 		});
 	}
 
-	private MouseListener rightClick(Object id,JPanel content,JButton button){
+	private MouseListener rightClick(Object id,String type,JPanel content,JButton button){
 		int ID = (int)id;
 		//右键弹出下载、分享、删除
 		JPopupMenu jPopupMenuOne = new JPopupMenu();
@@ -312,8 +312,10 @@ public class MyCloud extends JFrame{
 				}
 			}
 		});
-		jPopupMenuOne.add(down);
-		jPopupMenuOne.addSeparator();
+		if(type == "FILE"){
+			jPopupMenuOne.add(down);
+			jPopupMenuOne.addSeparator();
+		}
 		JMenuItem share = new JMenuItem("分享");
 		share.addActionListener(new ActionListener() {
 			@Override
@@ -321,8 +323,10 @@ public class MyCloud extends JFrame{
 
 			}
 		});
-		jPopupMenuOne.add(share);
-		jPopupMenuOne.addSeparator();
+		if(type == "FILE"){
+			jPopupMenuOne.add(share);
+			jPopupMenuOne.addSeparator();
+		}
 		JMenuItem delete = new JMenuItem("删除");
 		delete.addActionListener(new ActionListener() {
 			@Override
