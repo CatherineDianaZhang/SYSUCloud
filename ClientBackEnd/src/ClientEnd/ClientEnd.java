@@ -255,6 +255,32 @@ public class ClientEnd extends Thread {
 
     }
 
+    public void delFolder(String fullPath, CallBackFunc callBackFunc) throws Exception {
+        final MediaType JSON = MediaType.parse("application/json");
+        Request request = new Request.Builder()
+                .url(this.url + ':' + this.port + "/folders/" + fullPath)
+                .delete(new FormBody.Builder().build())
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try {
+                    callBackFunc.done(new CallBackFunArg(response.code() == 200, null, null));
+                    response.body().close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
+
+
     public void download(int fileId, String savePath, CallBackFunc callBackFunc, CallBackFunc progressLength) throws Exception {
         Request request = new Request.Builder()
                 .url(this.url + ':' + this.port + "/files/" + fileId +"/download/")
@@ -391,5 +417,7 @@ public class ClientEnd extends Thread {
             }
         });
     }
+
+
     
 }
