@@ -320,7 +320,13 @@ public class MyCloud extends JFrame{
 		share.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				clientEnd.shareFile(ID, new CallBackFunc() {
+					@Override
+					public void done(CallBackFunArg callBackFunArg) throws Exception {
+						String temp = callBackFunArg.jsonObject.toString();
+						JOptionPane.showMessageDialog(null,temp,"分享URL",JOptionPane.PLAIN_MESSAGE);
+					}
+				});
 			}
 		});
 		if(type == "FILE"){
