@@ -312,7 +312,7 @@ public class MyCloud extends JFrame{
 				}
 			}
 		});
-		if(type == "FILE"){
+		if(type.equals("FILE")){
 			jPopupMenuOne.add(down);
 			jPopupMenuOne.addSeparator();
 		}
@@ -329,7 +329,7 @@ public class MyCloud extends JFrame{
 				});
 			}
 		});
-		if(type == "FILE"){
+		if(type.equals("FILE")){
 			jPopupMenuOne.add(share);
 			jPopupMenuOne.addSeparator();
 		}

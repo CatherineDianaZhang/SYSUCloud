@@ -411,7 +411,7 @@ public class ClientEnd extends Thread {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
                     ResponseBody body = response.body();
-                    callBackFunc.done(new CallBackFunArg(response.code() == 200, JSONObject.parseObject(body.toString()), null));
+                    callBackFunc.done(new CallBackFunArg(response.code() == 200, JSONObject.parseObject(body.string()), null));
                     body.close();
                 } catch (Exception e) {
                     e.printStackTrace();
