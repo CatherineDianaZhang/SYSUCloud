@@ -13,6 +13,7 @@ import java.io.File;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 
 public class MyCloud extends JFrame{
 	
@@ -23,10 +24,13 @@ public class MyCloud extends JFrame{
 	private JTextField showFileWay;
 	private String path;
 	private JPanel fileContent;
+	private JTable shareContent;
 	private ClientEnd clientEnd;
+	private JFrame cloud;
 
 	public MyCloud(Frame cloud, ClientEnd clientEnd) {
 		this.clientEnd = clientEnd;
+		this.cloud = cloud;
 		cloud.setTitle("SYSUCloud");
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(0,0,0,0));
@@ -323,8 +327,10 @@ public class MyCloud extends JFrame{
 				clientEnd.shareFile(ID, new CallBackFunc() {
 					@Override
 					public void done(CallBackFunArg callBackFunArg) throws Exception {
-						String temp = callBackFunArg.jsonObject.toString();
-						JOptionPane.showMessageDialog(null,temp,"分享URL",JOptionPane.PLAIN_MESSAGE);
+						String temp = callBackFunArg.jsonObject.getString("id");
+						String link = "http://fffeng.rwong.cc/share/"+temp;
+						JOptionPane.showMessageDialog(null,link,"分享链接",JOptionPane.PLAIN_MESSAGE);
+						showShare();
 					}
 				});
 			}
@@ -358,17 +364,27 @@ public class MyCloud extends JFrame{
 
 	protected JScrollPane makeSharePage(JFrame cloud,ClientEnd clientEnd) {
 		JScrollPane sharePage = new JScrollPane();
-		JPanel shareContent = new JPanel();
+		shareContent = new JTable();
 		shareContent.setBackground(Color.white);
+		DefaultTableModel model = (DefaultTableModel)shareContent.getModel();
+		model.setColumnIdentifiers(new Object[]{"文件名称","分享链接","分享时间"});
+		shareContent.setModel(model);
+		shareContent.getTableHeader().setReorderingAllowed(false);
+		sharePage.getViewport().setBackground(shareContent.getBackground());
 		sharePage.setViewportView(shareContent);
-		
-		
-		
-		
-		
 		return sharePage;
 	}
-	
+
+	protected void showShare(){
+		/*clientEnd.getShareList(new CallBackFunc() {
+			@Override
+			public void done(CallBackFunArg callBackFunArg) throws Exception {
+				JSONObject list= callBackFunArg.jsonObject;
+
+			}
+		});*/
+	}
+
 	protected JScrollPane makeTransPage(JFrame cloud,ClientEnd clientEnd) {
 		JScrollPane transPage = new JScrollPane();
 		JPanel transContent = new JPanel();
