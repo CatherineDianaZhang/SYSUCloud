@@ -44,7 +44,7 @@ public class ClientEnd extends Thread {
 
     public void logOut(CallBackFunc callBackFunc) throws Exception {
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/user/log_out")
+                .url(this.getUrl() + ':' + this.getPort() + "/user/log_out")
                 .post(RequestBody.create(MediaType.parse("application/json"), ""))
                 .build();
 
@@ -74,7 +74,7 @@ public class ClientEnd extends Thread {
         json.put("username", username);
         json.put("password", password);
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/user/sign_in")
+                .url(this.getUrl() + ':' + this.getPort() + "/user/sign_in")
                 .post(RequestBody.create(JSON, json.toString()))
                 .build();
 
@@ -119,7 +119,7 @@ public class ClientEnd extends Thread {
         json.put("email", email);
         json.put("name", name);
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/user/sign_up")
+                .url(this.getUrl() + ':' + this.getPort() + "/user/sign_up")
                 .post(RequestBody.create(JSON, json.toString()))
                 .build();
         System.out.println("准备注册");
@@ -157,7 +157,7 @@ public class ClientEnd extends Thread {
     public void getFileList(String path, CallBackFunc callBackFunc) throws Exception {
 //        final MediaType JSON = MediaType.parse("application/json");
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/folders" + path)
+                .url(this.getUrl() + ':' + this.getPort() + "/folders" + path)
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -208,7 +208,7 @@ public class ClientEnd extends Thread {
     public void getFileDetails(int fileId, CallBackFunc callBackFunc) throws Exception {
         final MediaType JSON = MediaType.parse("application/json");
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/files/" + fileId)
+                .url(this.getUrl() + ':' + this.getPort() + "/files/" + fileId)
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -221,6 +221,7 @@ public class ClientEnd extends Thread {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
                     ResponseBody body = response.body();
+                    assert body != null;
                     callBackFunc.done(new CallBackFunArg(false, JSONObject.parseObject(body.string()), null));
                     body.close();
                 } catch (Exception e) {
@@ -233,7 +234,7 @@ public class ClientEnd extends Thread {
     public void delFile(int fileId, CallBackFunc callBackFunc) throws Exception {
         final MediaType JSON = MediaType.parse("application/json");
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/files/" + fileId)
+                .url(this.getUrl() + ':' + this.getPort() + "/files/" + fileId)
                 .delete(new FormBody.Builder().build())
                 .build();
         client.newCall(request).enqueue(new Callback() {
@@ -258,7 +259,7 @@ public class ClientEnd extends Thread {
     public void delFolder(String fullPath, CallBackFunc callBackFunc) throws Exception {
         final MediaType JSON = MediaType.parse("application/json");
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/folders/" + fullPath)
+                .url(this.getUrl() + ':' + this.getPort() + "/folders/" + fullPath)
                 .delete(new FormBody.Builder().build())
                 .build();
         client.newCall(request).enqueue(new Callback() {
@@ -283,7 +284,7 @@ public class ClientEnd extends Thread {
 
     public void download(int fileId, String savePath, CallBackFunc callBackFunc, CallBackFunc progressLength) throws Exception {
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/files/" + fileId +"/download/")
+                .url(this.getUrl() + ':' + this.getPort() + "/files/" + fileId +"/download/")
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -364,7 +365,7 @@ public class ClientEnd extends Thread {
                     .build();
 
             Request request = new Request.Builder()
-                    .url(this.url + ':' + this.port + "/files")
+                    .url(this.getUrl() + ':' + this.getPort() + "/files")
                     .post(requestBody)
                     .build();
 
@@ -411,7 +412,8 @@ public class ClientEnd extends Thread {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
                     ResponseBody body = response.body();
-                    callBackFunc.done(new CallBackFunArg(response.code() == 200, JSONObject.parseObject(body.toString()), null));
+                    assert body != null;
+                    callBackFunc.done(new CallBackFunArg(response.code() == 200, JSONObject.parseObject(body.string()), null));
                     body.close();
                 } catch (Exception e) {
                     e.printStackTrace();
