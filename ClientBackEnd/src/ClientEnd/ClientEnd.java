@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class ClientEnd extends Thread {
-    private static String url = "http://cloud.sysu.rwong.tech";
+    private static String url = "http://fffeng.rwong.cc";
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .cookieJar(new CookieJar() {
                 // Just for simply store JSESSIONID
@@ -36,7 +36,7 @@ public class ClientEnd extends Thread {
             .writeTimeout(1, TimeUnit.DAYS)
             .readTimeout(1, TimeUnit.DAYS)
             .build();
-    private static int port = 8080;
+    private static int port = 5750;
 
     public String getUrl() {return this.url;}
     public int getPort() {return this.port;}
