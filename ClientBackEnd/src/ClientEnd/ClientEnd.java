@@ -258,7 +258,7 @@ public class ClientEnd extends Thread {
     public void delFolder(String fullPath, CallBackFunc callBackFunc) throws Exception {
         final MediaType JSON = MediaType.parse("application/json");
         Request request = new Request.Builder()
-                .url(this.url + ':' + this.port + "/folders/" + fullPath)
+                .url(this.url + ':' + this.port + "/folders" + fullPath)
                 .delete(new FormBody.Builder().build())
                 .build();
         client.newCall(request).enqueue(new Callback() {

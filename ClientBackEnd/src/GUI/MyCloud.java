@@ -10,7 +10,9 @@ import com.alibaba.fastjson.JSONObject;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.nio.file.Paths;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
@@ -19,8 +21,8 @@ public class MyCloud extends JFrame{
 	
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private ImageIcon folder = new ImageIcon("C:\\Users\\Catherine\\Desktop\\SYSUCloud\\folder.png");
-	private ImageIcon txt = new ImageIcon("C:\\Users\\Catherine\\Desktop\\SYSUCloud\\txt.png");
+	private ImageIcon folder;
+	private ImageIcon txt;
 	private JTextField showFileWay;
 	private String path;
 	private JPanel fileContent;
@@ -32,6 +34,10 @@ public class MyCloud extends JFrame{
 		this.clientEnd = clientEnd;
 		this.cloud = cloud;
 		cloud.setTitle("SYSUCloud");
+
+		this.folder = new ImageIcon(Paths.get("src/GUI/folder.png").toAbsolutePath().toString());
+		this.txt = new ImageIcon(Paths.get("src/GUI/txt.png").toAbsolutePath().toString());
+
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(0,0,0,0));
 		contentPane.setLayout(new GridLayout(1,1));
@@ -56,6 +62,8 @@ public class MyCloud extends JFrame{
 		cards.add(contentPane,"mainPage");
 		CardLayout card = (CardLayout)(cards.getLayout());
 		card.show(cards, "mainPage");
+
+
 	}
 	
 	protected JPanel makeFilePage(JFrame cloud,ClientEnd clientEnd) {
