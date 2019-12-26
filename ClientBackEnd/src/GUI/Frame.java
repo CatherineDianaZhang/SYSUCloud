@@ -1,8 +1,11 @@
 package GUI;
 
 import ClientEnd.ClientEnd;
+import okhttp3.OkHttpClient;
 
 import java.awt.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 public class Frame extends JFrame{
@@ -16,6 +19,7 @@ public class Frame extends JFrame{
 	
 	public static void main(String[] args)
     {
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         Frame cloud = new Frame();
 		ClientEnd clientEnd = new ClientEnd();
         SignIn signIn = new SignIn(cloud,clientEnd);
