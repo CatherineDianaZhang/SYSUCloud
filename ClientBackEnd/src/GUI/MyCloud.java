@@ -52,9 +52,6 @@ public class MyCloud extends JFrame{
 		JScrollPane sharePage = makeSharePage(cloud,clientEnd);
 		pages.addTab("我的分享", sharePage);
 		
-		//JScrollPane transPage = makeTransPage(cloud,clientEnd);
-		//pages.addTab("我的传输", transPage);
-		
 		contentPane.add(pages);
 		
 		//添加整个页面
@@ -165,7 +162,6 @@ public class MyCloud extends JFrame{
 		files.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.white));
 		files.setPreferredSize(new Dimension(770,500));
 		fileContent = new JPanel();
-		//fileContent.setPreferredSize(new Dimension(760,390));
 		fileContent.setBackground(Color.white);
 		files.setViewportView(fileContent);
 
@@ -195,19 +191,10 @@ public class MyCloud extends JFrame{
 		fileContent.addMouseListener(popupListener);
 			//文件列表
 		showFile("/");
-				
-		//quickShare
-		quickShare.setPreferredSize(new Dimension(770,80));
-		quickShare.setBackground(Color.white);
-		JLabel filler=new JLabel("<html><p align=\"center\">右键点击或将文件拖拽到这里进行分享</p><br><p align=\"center\">支持扩展名：.rar .zip .doc .docx .pdf .jpg...</p></html>");
-	    filler.setHorizontalAlignment(JLabel.CENTER);
-	    quickShare.setLayout(new GridLayout(1,1));
-	    quickShare.add(filler);
 	    
-		//添加三个页面
+		//添加页面
 		filePage.add(addressAndUpdate,BorderLayout.NORTH);
 		filePage.add(files, BorderLayout.SOUTH);
-		//filePage.add(quickShare,BorderLayout.SOUTH);
 		return filePage;
 	}
 
@@ -226,7 +213,6 @@ public class MyCloud extends JFrame{
 				public void done(CallBackFunArg callBackFunArg) throws Exception{
 					System.out.println(callBackFunArg.jsonObject.toJSONString());
 					JSONArray fileList = callBackFunArg.jsonObject.getJSONArray("children");
-					//System.out.println(fileList.size());
 					for(int i=0;i<fileList.size();i++){
 						JSONObject obj = (JSONObject) fileList.get(i);
 						JButton b = new JButton(obj.getString("name"));
@@ -247,7 +233,6 @@ public class MyCloud extends JFrame{
 										ex.printStackTrace();
 									}
 								}
-								//else if(e.getClickCount() == 2 && obj.get("type") == "FILE") openFile(obj.get("id"));
 							}
 						});
 						MouseListener popupListener = rightClick(obj.get("id"),obj.getString("type"), obj.getString("fullPath"), fileContent,b);
@@ -271,7 +256,6 @@ public class MyCloud extends JFrame{
 			@Override
 			public void done(CallBackFunArg callBackFunArg) throws Exception {
 				JSONObject obj = callBackFunArg.jsonObject;
-				//JSONArray  children = (JSONArray) obj.get("children");
 				String temp = showFileWay.getText()+"/"+obj.getString("name");
 				showFileWay.setText(temp);
 				path = obj.getString("fullPath");
@@ -284,7 +268,6 @@ public class MyCloud extends JFrame{
 		int ID = (int)id;
 		//右键弹出下载、分享、删除
 		JPopupMenu jPopupMenuOne = new JPopupMenu();
-		ButtonGroup buttonGroupOne = new ButtonGroup();
 		JMenuItem down = new JMenuItem("下载");
 		down.addActionListener(new ActionListener() {
 			@Override
@@ -421,16 +404,6 @@ public class MyCloud extends JFrame{
 		}
 	}
 
-	protected JScrollPane makeTransPage(JFrame cloud,ClientEnd clientEnd) {
-		JScrollPane transPage = new JScrollPane();
-		JPanel transContent = new JPanel();
-		transContent.setBackground(Color.white);
-		transPage.setViewportView(transContent);
-		
-		
-		return transPage;
-	}
-
 	class PopupListener extends MouseAdapter {
 		JPopupMenu popupMenu;
 		PopupListener(JPopupMenu popupMenu) {
@@ -445,7 +418,6 @@ public class MyCloud extends JFrame{
 		private void showPopupMenu(MouseEvent e) {
 			if(e.isPopupTrigger())
 			{
-				//如果当前事件与鼠标事件相关，则弹出菜单
 				popupMenu.show(e.getComponent(),e.getX(),e.getY());
 			}
 		}
